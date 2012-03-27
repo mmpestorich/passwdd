@@ -1,7 +1,7 @@
 #summary Currently supported mechanisms
 
 The following mechanisms have been tested and are known to work:
-  * DIGEST-MD5
+  * DIGEST-MD5 (AFP)
   * CRAM-MD5
 
 These mechanisms have not been fully tested yet:
@@ -17,4 +17,4 @@ These mechanisms have not been fully tested yet:
   * APOP
 
 These mechanisms are known to not work yet:
-  * WEBDAV-DIGEST (iChat server)
+  * WEBDAV-DIGEST (iChat server, Address Book, iCal, Wiki, Collaboration Services)
