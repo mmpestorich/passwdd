@@ -15,3 +15,6 @@ These mechanisms have not been fully tested yet:
   * WEBDAV-DIGEST
   * DHX
   * APOP
+
+These mechanisms are known to not work yet:
+  * WEBDAV-DIGEST (iChat server)
