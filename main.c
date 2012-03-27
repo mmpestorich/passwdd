@@ -55,6 +55,10 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
         snprintf(option_name, sizeof(option_name) - 1, "sasl_%s", option);
     option_name[sizeof(option_name) - 1] = '\0';
 
+#ifdef DEBUG
+    printf("CyrusOption: %s\r\n", option_name);
+#endif
+
     //
     // Get the value for this option.
     //
@@ -74,7 +78,9 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
 //
 static int log_func(void *context, int level, const char *message)
 {
-//    printf("%s\r\n", message);
+#ifdef DEBUG
+    printf("CyrusLog: %s\r\n", message);
+#endif
 
     return SASL_OK;
 }
@@ -126,7 +132,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    init_auxprop();
+//    init_auxprop();
 
     if (setupListeners() == -1) {
         printf("Failed to setup server sockets.\r\n");

@@ -36,7 +36,7 @@ int loadKeys()
     FILE *fp;
 
 
-    fp = fopen("mykey.pem", "r");
+    fp = fopen("/etc/lpws.pem", "r");
     if (fp == NULL)
         return -1;
 

@@ -29,9 +29,10 @@ DEALINGS IN THE SOFTWARE.
 #define CLIENT_MAX      64
 #define BUFFER_SIZE     1024
 #define ARGS_MAX        32
-#define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" \"DHX\" \"APOP\" )"
+#define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"DHX\" \"APOP\" )"
+//#define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" \"DHX\" \"APOP\" )"
 
-//#define DEBUG
+#define DEBUG
 
 #endif /* __COMMON_H__ */
 
