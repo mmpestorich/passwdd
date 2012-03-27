@@ -236,8 +236,14 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
     // Convert hex data to binary.
     //
     if (argc >= 3) {
-        hexToBinary(argv[1], data, &dataLen);
-        args++;
+//        if (argc >= 4 && strcmp(argv[2], "replay") == 0) {
+//            hexToBinary(argv[3], data, &dataLen);
+//            args += 2;
+//        }
+//        else {
+            hexToBinary(argv[2], data, &dataLen);
+            args++;
+//        }
     }
 
     //
