@@ -1,0 +1,17 @@
+#summary Currently supported mechanisms
+
+The following mechanisms have been tested and are known to work:
+  * DIGEST-MD5
+  * CRAM-MD5
+
+These mechanisms have not been fully tested yet:
+  * SMB-NTLMv2
+  * SMB-NT
+  * SMB-LAN-MANAGER
+  * MS-CHAPv2
+  * PPS
+  * OTP
+  * GSSAPI
+  * WEBDAV-DIGEST
+  * DHX
+  * APOP
