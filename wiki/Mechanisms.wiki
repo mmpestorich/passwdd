@@ -1,7 +1,8 @@
 #summary Currently supported mechanisms
 
 The following mechanisms have been tested and are known to work:
-  * DIGEST-MD5 (AFP)
+  * WEBDAV-DIGEST (Wiki, Collaboration Services, 
+  * DIGEST-MD5 (AFP, su)
   * CRAM-MD5
 
 These mechanisms have not been fully tested yet:
@@ -16,5 +17,8 @@ These mechanisms have not been fully tested yet:
   * DHX
   * APOP
 
-These mechanisms are known to not work yet:
-  * WEBDAV-DIGEST (iChat server, Address Book, iCal, Wiki, Collaboration Services)
+These mechanisms are known to partially work:
+  * WEBDAV-DIGEST (iChat server, Address Book, iCal)
+    * Works with: Wiki, Collaboration Services, iCal
+    * Does NOT work with: Address Book
+    * Untested: iChat
