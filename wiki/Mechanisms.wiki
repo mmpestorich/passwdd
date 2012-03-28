@@ -10,6 +10,9 @@ These mechanisms are known to at-least partially work (more testing is needed):
     * Does NOT work with: ??
     * Untested: ??
 
+These mechanisms are known to not work yet:
+  * DHX (This seems to be required for changing passwords)
+
 These mechanisms have not been fully tested yet:
   * SMB-NTLMv2
   * SMB-NT
@@ -18,6 +21,4 @@ These mechanisms have not been fully tested yet:
   * PPS
   * OTP
   * GSSAPI
-  * WEBDAV-DIGEST
-  * DHX
   * APOP
