@@ -1,9 +1,14 @@
 #summary Currently supported mechanisms
 
-The following mechanisms have been tested and are known to work:
-  * WEBDAV-DIGEST (Wiki, Collaboration Services, 
+The following mechanisms have been tested and are known to fully work:
   * DIGEST-MD5 (AFP, su)
   * CRAM-MD5
+
+These mechanisms are known to at-least partially work (more testing is needed):
+  * WEBDAV-DIGEST
+    * Works with: Wiki, Collaboration Services, Address Book, iCal, iChat
+    * Does NOT work with: ??
+    * Untested: ??
 
 These mechanisms have not been fully tested yet:
   * SMB-NTLMv2
@@ -16,9 +21,3 @@ These mechanisms have not been fully tested yet:
   * WEBDAV-DIGEST
   * DHX
   * APOP
-
-These mechanisms are known to partially work:
-  * WEBDAV-DIGEST
-    * Works with: Wiki, Collaboration Services, Address Book, iCal, iChat
-    * Does NOT work with: ??
-    * Untested: ??
