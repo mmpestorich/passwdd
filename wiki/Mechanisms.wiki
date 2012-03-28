@@ -18,7 +18,7 @@ These mechanisms have not been fully tested yet:
   * APOP
 
 These mechanisms are known to partially work:
-  * WEBDAV-DIGEST (iChat server, Address Book, iCal)
-    * Works with: Wiki, Collaboration Services, iCal
-    * Does NOT work with: Address Book
-    * Untested: iChat
+  * WEBDAV-DIGEST
+    * Works with: Wiki, Collaboration Services, Address Book, iCal, iChat
+    * Does NOT work with: ??
+    * Untested: ??
