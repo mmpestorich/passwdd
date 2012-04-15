@@ -87,8 +87,8 @@ static int log_func(void *context, int level, const char *message)
 
 
 static sasl_callback_t callbacks[] = {
-    { SASL_CB_GETOPT, &getopt_func, NULL },
-    { SASL_CB_LOG, &log_func, NULL },
+    { SASL_CB_GETOPT, (int (*)())&getopt_func, NULL },
+    { SASL_CB_LOG, (int (*)())&log_func, NULL },
     { SASL_CB_LIST_END, NULL, NULL }
 };
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,18 +20,43 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#include <config.h>
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#ifndef macintosh
+#include <sys/stat.h>
+#endif
+#include <fcntl.h>
+#include <assert.h>
 
-#define LISTENER_MAX    32
-#define USERNAME_MAX    64
-#define CLIENT_MAX      64
-#define BUFFER_SIZE     1024
-#define ARGS_MAX        32
-#define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" \"DHX\" \"APOP\" )"
+#include <sasl.h>
+#include <saslplug.h>
+#include <saslutil.h>
 
-#define DEBUG
+#include "plugin_common.h"
 
-#endif /* __COMMON_H__ */
+#ifdef macintosh
+#include <sasl_plain_plugin_decl.h>
+#endif
+
+#ifdef WIN32
+BOOL APIENTRY DllMain(HANDLE hModule, 
+                      DWORD  ul_reason_for_call, 
+                      LPVOID lpReserved)
+{
+    switch (ul_reason_for_call)
+    {
+        case DLL_PROCESS_ATTACH:
+        case DLL_THREAD_ATTACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+    return TRUE;
+}
+#endif
+
+SASL_SERVER_PLUG_INIT(dhx)
 

@@ -28,6 +28,7 @@ DEALINGS IN THE SOFTWARE.
 #include <sasl/saslplug.h>
 #include <sasl/saslutil.h>
 #include <ldap.h>
+#include <lber.h>
 
 
 #define BIND_RETRIES	5
@@ -148,12 +149,13 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
                                      const char *user,
                                      unsigned ulen)
 {
+    struct berval	cred;
     lpws_context *context = glob_context;
     int version = 3, result, i;
     LDAP *ldap = NULL;
     char *attrlist[32], *search, *s;
     LDAPMessage *ldapresults = NULL, *ldapresult = NULL;
-    char **attrvalues;
+    struct berval **attrvalues;
 
 
     //
@@ -171,7 +173,7 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
     result = ldap_set_option(ldap, LDAP_OPT_PROTOCOL_VERSION, &version);
     if (result != LDAP_SUCCESS) {
         printf("Option failure.\r\n");
-        ldap_unbind_s(ldap);
+        ldap_unbind_ext_s(ldap, NULL, NULL);
 
         return;
     }
@@ -179,8 +181,11 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
     //
     // Try a few times to bind.
     //
+    cred.bv_val = (char *)context->bindpw;
+    cred.bv_len = strlen(context->bindpw);
     for (i = 0; i < BIND_RETRIES; i++) {
-        result = ldap_simple_bind_s(ldap, context->binddn, context->bindpw);
+        result = ldap_sasl_bind_s(ldap, context->binddn, LDAP_SASL_SIMPLE,
+                                  &cred, NULL, NULL, NULL);
         if (result == LDAP_SUCCESS)
             break;
 
@@ -188,7 +193,7 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
         sleep(2);
     }
     if (i == BIND_RETRIES) {
-        ldap_unbind_s(ldap);
+        ldap_unbind_ext_s(ldap, NULL, NULL);
 
         return;
     }
@@ -224,7 +229,7 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
                                1, &ldapresults);
     free(search);
     if (result != LDAP_SUCCESS) {
-        ldap_unbind_s(ldap);
+        ldap_unbind_ext_s(ldap, NULL, NULL);
 
         return;
     }
@@ -235,18 +240,18 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
     ldapresult = ldap_first_entry(ldap, ldapresults);
     if (ldapresult == NULL) {
         ldap_msgfree(ldapresults);
-        ldap_unbind_s(ldap);
+        ldap_unbind_ext_s(ldap, NULL, NULL);
     }
 
     //
     // Process the retrieved attributes.
     //
     for (i = 0; global_attrs[i].ldap != NULL; i++) {
-        attrvalues = ldap_get_values(ldap, ldapresult, global_attrs[i].ldap);
+        attrvalues = ldap_get_values_len(ldap, ldapresult, global_attrs[i].ldap);
         if (attrvalues != NULL && attrvalues[0] != NULL) {
             sparams->utils->prop_erase(sparams->propctx, global_attrs[i].sasl);
             sparams->utils->prop_set(sparams->propctx, global_attrs[i].sasl,
-                                     attrvalues[0], strlen(attrvalues[0]));
+                                     attrvalues[0]->bv_val, attrvalues[0]->bv_len);
         }
     }
 
@@ -254,7 +259,7 @@ static void lpws_ldap_auxprop_lookup(void *glob_context,
     // Cleanup.
     //
     ldap_msgfree(ldapresults);
-    ldap_unbind_s(ldap);
+    ldap_unbind_ext_s(ldap, NULL, NULL);
 }
 
 
