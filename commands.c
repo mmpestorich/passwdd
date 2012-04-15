@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string.h>
 #include <sasl/sasl.h>
 #include <sasl/saslutil.h>
+#include <limits.h>
 #include <openssl/bn.h>
 #include <openssl/rsa.h>
 #include "commands.h"
@@ -167,6 +168,7 @@ int command_rsavalidate(char *response, int argc, char *argv[], Client *client, 
 //
 int command_user(char *response, int argc, char *argv[], Client *client, void *context)
 {
+    sasl_security_properties_t secprops;
     int result = 0;
 
 
@@ -177,6 +179,29 @@ int command_user(char *response, int argc, char *argv[], Client *client, void *c
         buffercatf(response, "-ERR Must specify user\r\n");
 
         return 0;
+    }
+
+    //
+    // Initialize the SASL connection.
+    //
+    result = sasl_server_new("rcmd", NULL, NULL, NULL, NULL, NULL, 0, &client->sasl);
+    if (result != SASL_OK) {
+        buffercatf(response, "-ERR SASL Error %d\r\n", result);
+
+        return 1;
+    }
+
+    //
+    // Set the SSF security properties.
+    //
+    memset(&secprops, 0L, sizeof(secprops));
+    secprops.maxbufsize = 2048;
+    secprops.max_ssf = UINT_MAX;
+    result = sasl_setprop(client->sasl, SASL_SEC_PROPS, &secprops);
+    if (result != SASL_OK) {
+        buffercatf(response, "-ERR SASL Error %d\r\n", result);
+
+        return 1;
     }
 
     //
@@ -236,14 +261,17 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
     // Convert hex data to binary.
     //
     if (argc >= 3) {
-//        if (argc >= 4 && strcmp(argv[2], "replay") == 0) {
-//            hexToBinary(argv[3], data, &dataLen);
-//            args += 2;
-//        }
-//        else {
+        if (argc >= 4 && strcmp(argv[2], "replay") == 0) {
+            //
+            // Special case handling for WEBDAV-DIGEST.
+            //
+            hexToBinary(argv[3], data, &dataLen);
+            args += 2;
+        }
+        else {
             hexToBinary(argv[2], data, &dataLen);
             args++;
-//        }
+        }
     }
 
     //
@@ -258,6 +286,7 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
     // If result is SASL_OK then we are finished.
     //
     if (result == SASL_OK) {
+        printf("Authenticated user %s using %s\r\n", client->username, argv[1]);
         buffercatf(response, "+OK\r\n");
 
         return args;
@@ -334,6 +363,7 @@ int command_auth2(char *response, int argc, char *argv[], Client *client, void *
     // If result is SASL_OK then we are finished.
     //
     if (result == SASL_OK) {
+        printf("Authenticated user %s.\r\n", client->username);
         buffercatf(response, "+OK\r\n");
 
         return 1;

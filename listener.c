@@ -27,7 +27,6 @@ DEALINGS IN THE SOFTWARE.
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sasl/sasl.h>
 #include "common.h"
 #include "listener.h"
 #include "client.h"
@@ -174,6 +173,7 @@ static int processUdpListener(int fd)
 
 
     len = recvfrom(fd, buffer, sizeof(buffer) - 1, 0, (struct sockaddr *)&addr, &addrlen);
+    len = len; /* clear warning for now */
     printf("Ignoring UDP message.\r\n");
 
     return -1;
@@ -187,10 +187,9 @@ static int processUdpListener(int fd)
 static int processTcpListener(int fd)
 {
     struct sockaddr_in addr;
-    sasl_conn_t *conn;
     socklen_t addrlen;
-    int child, result;
-    char *msg;
+    int child;
+    const char *msg;
 
 
     //
@@ -209,21 +208,9 @@ static int processTcpListener(int fd)
     }
 
     //
-    // Initialize the SASL connection.
-    //
-    result = sasl_server_new("rcmd", NULL, NULL, NULL, NULL, NULL, 0, &conn);
-    if (result != SASL_OK) {
-        msg = "-ERR Internal error\r\n";
-        write(child, msg, strlen(msg));
-        close(child);
-
-        return -1;
-    }
-
-    //
     // Save the child to the next available client.
     //
-    if (add_client(child, conn) != NULL) {
+    if (add_client(child, NULL) != NULL) {
         msg = "+OK LinuxPasswordServer 1.0 password server at 127.0.0.1 ready.\r\n";
         write(child, msg, strlen(msg));
 
