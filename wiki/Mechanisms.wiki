@@ -3,6 +3,7 @@
 The following mechanisms have been tested and are known to fully work:
   * DIGEST-MD5 (AFP, su)
   * CRAM-MD5
+  * DHX
 
 These mechanisms are known to at-least partially work (more testing is needed):
   * WEBDAV-DIGEST
@@ -10,10 +11,7 @@ These mechanisms are known to at-least partially work (more testing is needed):
     * Does NOT work with: ??
     * Untested: ??
 
-These mechanisms are known to not work yet:
-  * DHX (This seems to be required for changing passwords; also used during login window login, but seems to work without)
-
-These mechanisms have not been fully tested yet:
+These mechanisms have not been fully tested yet (frankly they may never be used):
   * SMB-NTLMv2
   * SMB-NT
   * SMB-LAN-MANAGER
