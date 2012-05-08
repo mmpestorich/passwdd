@@ -1,0 +1,22 @@
+#summary How to go about building the Linux Password Server
+
+= Pre-Requisites =
+
+You will need the development libraries for the following packages:
+ * cyrus-sasl
+ * openssl
+ * cryptopp
+ * openldap
+
+If you are on a Fedora machine you can get those with
+{{{
+yum install cyrus-sasl-devel openssl-devel cryptopp-devel openldap-devel
+}}}
+
+= Build =
+
+Once you have those download the source code and extract it. Then run the *make* command from the lpws folder.
+
+The Makefile is currently setup for a Fedora 64-bit system, but it should work on a 32-bit system as well and hopefully other systems.
+
+= Installing =
