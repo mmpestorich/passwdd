@@ -1,8 +1,15 @@
+MACHINE := $(shell uname -i)
+
 CC = gcc
 CPP = g++
 CFLAGS = -ggdb -Wall -O -I. -I/usr/include/sasl -I/usr/include/cryptopp
 LDFLAGS = -lcrypto -lsasl2 -lcryptopp
+ifeq ($(MACHINE), x86_64)
 PLUGIN_DIR = /usr/lib64/sasl2
+endif
+ifeq ($(MACHINE), i686)
+PLUGIN_DIR = /usr/lib/sasl2
+endif
 LIBTOOL = libtool
 
 all: libwebdavdigest.la libdhx.la liblpws_ldap.la
@@ -23,9 +30,9 @@ libdhx.la: dhx.lo dhx_init.lo
 	$(LIBTOOL) --mode=compile $(CPP) $(CFLAGS) -c $<
 
 install/%.la: %.la
-	$(LIBTOOL) --mode=install install -c $(notdir $@) $(PLUGIN_DIR)/$(notdir $@)
+	$(LIBTOOL) --mode=install install -D -c $(notdir $@) $(DESTDIR)$(PLUGIN_DIR)/$(notdir $@)
 install: $(addprefix install/,libwebdavdigest.la) $(addprefix install/,libdhx.la) $(addprefix install/,liblpws_ldap.la)
-	$(LIBTOOL) --mode=finish $(PLUGIN_DIR)
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(PLUGIN_DIR)
 
 clean:
 	rm -rf *.o .libs *.lo *.so *.la
