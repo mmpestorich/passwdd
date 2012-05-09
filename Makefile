@@ -21,6 +21,6 @@ clean:
 	@cd sasl; $(MAKE) clean $(MFLAGS)
 
 install: all
-	$(INSTALL) -m 0755 -d $(DESTDIR)$(prefix)/bin
-	$(INSTALL) -m 0755 lpws $(DESTDIR)$(prefix)/bin
+	$(INSTALL) -m 0755 -d $(DESTDIR)$(prefix)/sbin
+	$(INSTALL) -m 0755 lpws $(DESTDIR)$(prefix)/sbin
 	@cd sasl; $(MAKE) install $(MFLAGS)
