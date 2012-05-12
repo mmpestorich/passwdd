@@ -16,3 +16,25 @@ openssl genrsa -out /etc/lpws.key 1024
 Later versions of this software will provide a method for better self-configuration.
 
 = Config File =
+
+The available options used directly by the _lpws_ binary are:
+ * *private_key* - This config option allows you to override the default location of the private key file.
+ * *sasl_auxprop_plugin* - While not strictly used by _lpws_ this option should be set and always set to *lpws_ldap*.
+
+Any SASL option can be set by prefixing the requested option name with sasl{{{_}}}. The LDAP auxprop module used by _lpws_ for retrieving the user's unencrypted password has the following options:
+ * *sasl_lpws_ldap_uri* - The URI used when connecting to the LDAP server.
+ * *sasl_lpws_ldap_basedn* - The search base to use when looking up a user's record.
+ * *sasl_lpws_ldap_search* - The query to use when searching. A basic query would be *uid=%u*.
+ * *sasl_lpws_ldap_binddn* - The DN to use when binding. This must be a DN that has access to read the userPassword property.
+ * *sasl_lpws_ldap_bindpw* - The password to use when binding with the above DN.
+
+An example config file might look like this.
+{{{
+private_key = /etc/lpws/private.key
+sasl_auxprop_plugin = lpws_ldap
+sasl_lpws_ldap_uri = ldap://127.0.0.1
+sasl_lpws_ldap_basedn = dc=example,dc=com
+sasl_lpws_ldap_search = uid=%u
+sasl_lpws_binddn = uid=lpws,ou=users,dc=example,dc=com
+sasl_lpws_bindpw = supersecret
+}}}
