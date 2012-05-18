@@ -36,9 +36,9 @@ An example config file might look like this.
 {{{
 private_key = /etc/lpws/private.key
 sasl_auxprop_plugin = lpws_ldap
-sasl_lpws_ldap_uri = ldap://127.0.0.1
-sasl_lpws_ldap_basedn = dc=example,dc=com
+ldap_uri = ldap://127.0.0.1
+ldap_basedn = dc=example,dc=com
+ldap_binddn = uid=lpws,ou=users,dc=example,dc=com
+ldap_bindpw = supersecret
 sasl_lpws_ldap_search = uid=%u
-sasl_lpws_ldap_binddn = uid=lpws,ou=users,dc=example,dc=com
-sasl_lpws_ldap_bindpw = supersecret
 }}}
