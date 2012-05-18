@@ -20,12 +20,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <stdio.h>
+#include <string.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include "keys.h"
+#include "config.h"
+#include "utils.h"
 
 
 RSA *privateKey = NULL;
+const char *publicKeyThumbprint = NULL;
 
 
 //
@@ -33,17 +38,66 @@ RSA *privateKey = NULL;
 //
 int loadKeys()
 {
-    FILE *fp;
+    const char	*keyfile;
+    FILE	*fp;
+    char	*e, *m;
+    int		len;
 
 
-    fp = fopen("/etc/lpws.pem", "r");
-    if (fp == NULL)
+    //
+    // Allow the user to override the private key location, otherwise use
+    // the standard of /etc/lpws.key.
+    //
+    keyfile = find_config("private_key");
+    if (keyfile == NULL)
+        keyfile = "/etc/lpws.key";
+
+    //
+    // Try to open the key file.
+    //
+    fp = fopen(keyfile, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to find private key file '%s'\r\n", keyfile);
         return -1;
+    }
 
+    //
+    // Process the private key.
+    //
     privateKey = PEM_read_RSAPrivateKey(fp, NULL, NULL, NULL);
     fclose(fp);
-    
+
+    //
+    // Check if the key was valid.
+    //
+    if (privateKey == NULL) {
+        fprintf(stderr, "Invalid private key file '%s'\r\n", keyfile);
+        return -1;
+    }
+
+    //
+    // Calculate the public key thumbprint.
+    //
+    e = BN_bn2dec(privateKey->e);
+    m = BN_bn2dec(privateKey->n);
+    if (BN_num_bits(privateKey->n) > 8192) {
+        fprintf(stderr, "Your private key is larger than 8,192 bits. Think about it.\r\n");
+        return -1;
+    }
+
+    //
+    // Allocate space for the string and store it.
+    //
+    len = (5 + strlen(e) + 1 + strlen(m) + 1 + 5 + strlen(myHostname) + 1);
+    publicKeyThumbprint = (const char *)malloc(len);
+    snprintf((char *)publicKeyThumbprint, len, "%d %s %s %s",
+             BN_num_bits(privateKey->n), e, m, myHostname);
+
+    //
+    // Free temporary memory used by the SSL library.
+    //
+    OPENSSL_free(m);
+    OPENSSL_free(e);
+
     return 0;
 }           
-
-

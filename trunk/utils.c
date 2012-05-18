@@ -158,7 +158,7 @@ int base64ToBinary(const char *hexStr, char *data, int *dataLen)
         hexStr++;
     }
 
-    result = sasl_decode64(hexStr, strlen(hexStr), (char *)data, 256, &sasl_outlen);
+    result = sasl_decode64(hexStr, strlen(hexStr), (char *)data, BUFFER_SIZE, &sasl_outlen);
 
     if (attached_outlen > 0 && attached_outlen != sasl_outlen)
         return -1;

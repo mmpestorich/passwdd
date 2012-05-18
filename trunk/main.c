@@ -30,9 +30,12 @@ DEALINGS IN THE SOFTWARE.
 #include "keys.h"
 #include "config.h"
 #include "listener.h"
-
+#include "ldap.h"
 
 int doExit = 0;
+
+const char *myHostname = "ldap.infotest.hdcnet.org";
+const char *myAddress = "10.1.7.3";
 
 static void usage();
 
@@ -69,6 +72,20 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
         return SASL_OK;
     }
 
+    //
+    // If the value was not found and it is from the lpws_ldap plugin, then
+    // to see if we have a generic version of the same.
+    //
+    if (strcasecmp(plugin_name, "lpws_ldap") == 0) {
+        snprintf(option_name, sizeof(option_name) - 1, "ldap_%s", option);
+        value = find_config(option_name);
+        if (value != NULL) {
+            *result = value;
+
+            return SASL_OK;
+        }
+    }
+
     return SASL_FAIL;
 }
 
@@ -95,6 +112,7 @@ static sasl_callback_t callbacks[] = {
 
 static struct option longopts[] = {
 	{ "config",	required_argument,	NULL,		'c' },
+	{ "update",	no_argument,		NULL,		'u' },
 	{ "help",	no_argument,		NULL,		'h' },
 	{ NULL,		0,			NULL,		0 }
 };
@@ -103,13 +121,17 @@ static struct option longopts[] = {
 int main(int argc, char *argv[])
 {
     const char *config_file = "/etc/lpws.conf";
-    int ch;
+    int ch, updateAuth = 0;
 
 
-    while ((ch = getopt_long(argc, argv, "c:h", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, "c:h:u", longopts, NULL)) != -1) {
         switch (ch) {
             case 'c':
                 config_file = optarg;
+                break;
+
+            case 'u':
+                updateAuth = 1;
                 break;
 
             case 'h':
@@ -124,15 +146,23 @@ int main(int argc, char *argv[])
     if (init_config(config_file) == -1)
         exit(1);
 
+    if (loadKeys() == -1)
+        exit(1);
+
+    //
+    // Make sure all the user records have a authAuthority record for us.
+    //
+    if (updateAuth == 1) {
+        ldap_updateAuthority(0);
+        exit(0);
+    }
+
     init_client();
-    loadKeys();
 
     if (sasl_server_init(callbacks, "PasswordServer") != SASL_OK) {
         printf("Failed to initialize SASL.\r\n");
         exit(1);
     }
-
-//    init_auxprop();
 
     if (setupListeners() == -1) {
         printf("Failed to setup server sockets.\r\n");
@@ -164,8 +194,9 @@ int main(int argc, char *argv[])
 //
 static void usage()
 {
-    printf("Usage: lpws [-c config]\r\n");
+    printf("Usage:\r\n");
+    printf("\tlpws [-c config]\r\n");
+    printf("\tlpws [-c config] -u\r\n");
     exit(-1);
 }
-
 
