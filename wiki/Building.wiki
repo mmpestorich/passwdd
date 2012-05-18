@@ -8,9 +8,12 @@ You will need the development libraries for the following packages:
  * cryptopp
  * openldap
 
+You will also need the following SASL mechanisms installed:
+ * cyrus-sasl-md5
+
 If you are on a Fedora machine you can get those with
 {{{
-yum install cyrus-sasl-devel openssl-devel cryptopp-devel openldap-devel
+yum install cyrus-sasl-devel openssl-devel cryptopp-devel openldap-devel cyrus-sasl-md5
 }}}
 
 = Build =
