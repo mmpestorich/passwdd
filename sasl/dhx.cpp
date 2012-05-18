@@ -175,6 +175,31 @@ static void dhx_server_dispose(void *conn_context,
 }
 
 
+static int dhx_server_decode(void *conn_context,
+                             const char *input,
+                             unsigned int inputlen,
+                             const char **output,
+                             unsigned int *outputlen)
+{
+    server_context_t	*ctx = (server_context_t *)conn_context;
+
+
+    //
+    // Decrypt the buffer.
+    //
+    CAST_KEY	key;
+    byte iv[8];
+
+    *output = (const char *)malloc(inputlen);
+    memcpy(iv, "LWallace", 8);
+    CAST_set_key(&key, 16, ctx->sharedKey);
+    CAST_cbc_encrypt((const unsigned char *)input, (unsigned char *)*output, inputlen, &key, iv, CAST_DECRYPT);
+    *outputlen = inputlen;
+
+    return SASL_OK;
+}
+
+
 //
 // Perform a general step.
 //
@@ -324,6 +349,7 @@ static int dhx_server_mech_step(void *conn_context,
         oparams->decode_context = NULL;
         oparams->decode = NULL;
         oparams->param_version = 0;
+        oparams->decode = &dhx_server_decode;
 
         return result;
     }

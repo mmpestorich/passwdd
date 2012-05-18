@@ -25,11 +25,11 @@ DEALINGS IN THE SOFTWARE.
 #include <sasl/sasl.h>
 #include <sasl/saslutil.h>
 #include <limits.h>
-#include <openssl/bn.h>
 #include <openssl/rsa.h>
 #include "commands.h"
 #include "utils.h"
 #include "keys.h"
+#include "ldap.h"
 
 
 //
@@ -54,9 +54,15 @@ ClientCommand clientCommands[] = {
     { "LIST",           command_list },
     { "RSAPUBLIC",      command_rsapublic },
     { "RSAVALIDATE",    command_rsavalidate },
+    { "LISTREPLICAS",   command_listreplicas },
+
+    { "NEWUSER",        command_newuser },
+    { "DELETEUSER",     command_deleteuser },
+    { "CHANGEPASS",     command_changepass },
     { "USER",           command_user },
     { "AUTH",           command_auth },
     { "AUTH2",          command_auth2 },
+
     { "QUIT",           command_quit },
     { NULL,             NULL }
 };
@@ -79,18 +85,7 @@ int command_list(char *response, int argc, char *argv[], Client *client, void *c
 //
 int command_rsapublic(char *response, int argc, char *argv[], Client *client, void *context)
 {
-    char *e, *m;
-                
-
-    e = BN_bn2dec(privateKey->e);
-    m = BN_bn2dec(privateKey->n);
-
-    buffercatf(response, "+OK %d %s %s %s\r\n",
-               BN_num_bits(privateKey->d),
-               e, m, "root@daniel.hdcnet.org");
-
-    OPENSSL_free(m);
-    OPENSSL_free(e);
+    buffercatf(response, "+OK %s\r\n", publicKeyThumbprint);
 
     return 0;
 }
@@ -160,6 +155,97 @@ int command_rsavalidate(char *response, int argc, char *argv[], Client *client, 
     buffercatf(response, "+OK %s\r\n", encoded);
 
     return 1;
+}
+
+
+//
+// Retrieve a list of replica servers. This is an exact duplicate of the data
+// in the directory's "apple-password-server-list" key.
+//
+int command_listreplicas(char *response, int argc, char *argv[], Client *client, void *context)
+{
+    char *xml = ldap_replicalist();
+
+
+    //
+    // The ApplePasswordServer does not include an extra \r\n, which seems wrong
+    // to me, but when I include an extra \r\n things go bad.  So maybe it just
+    // checks if there is a "final" \r\n and adds it if there isn't, I don't know
+    // just yet.
+    //
+    buffercatf(response, "+OK %d %s", strlen(xml), xml);
+
+    return 0;
+}
+
+
+//
+// Create a new user and password, this is only used when creating
+// OpenDirectory passwords, which we do not support yet.
+//
+int command_newuser(char *response, int argc, char *argv[], Client *client, void *context)
+{
+//    const char	*decoded = NULL;
+//    unsigned	decodedLen = 0;
+//    char	encoded[BUFFER_SIZE];
+//    int		encodedLen;
+
+
+    //
+    // Verify we have the required number of arguments.
+    //
+    if (argc < 3) {
+        buffercatf(response, "-ERR Must specify value\r\n");
+
+        return (argc - 1);
+    }
+
+//    //
+//    // Convert the Base64 encoded value to raw data so we can
+//    // try to decrypt it.
+//    //
+//    if (base64ToBinary(argv[2], encoded, &encodedLen) != SASL_OK) {
+//        buffercatf(response, "-ERR SASL Error\r\n");
+//
+//        return 2;
+//    }
+//
+//    //
+//    // Decode the password.
+//    //
+//    sasl_decode(client->sasl, encoded, encodedLen, &decoded, &decodedLen);
+//    printf("password = %s\r\n", decoded);
+//
+//    //
+//    // Add the response. The return argument is the "slot id", which for us
+//    // right now is just the username.
+//    //
+//    buffercatf(response, "+OK %s\r\n", argv[1]);
+    buffercatf(response, "-ERR Unsupported\r\n");
+
+    return 2;
+}
+
+
+//
+// Delete the user from the database. Right now this is a no-op.
+//
+int command_deleteuser(char *response, int argc, char *argv[], Client *client, void *context)
+{
+    buffercatf(response, "+OK\r\n");
+
+    return 1;
+}
+
+
+//
+// Change a user's password. Right now this is a no-op.
+//
+int command_changepass(char *response, int argc, char *argv[], Client *client, void *context)
+{
+    buffercatf(response, "+OK\r\n");
+
+    return 2;
 }
 
 

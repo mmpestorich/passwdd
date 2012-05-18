@@ -28,6 +28,7 @@ DEALINGS IN THE SOFTWARE.
 extern int loadKeys();
 
 extern RSA *privateKey;
+extern const char *publicKeyThumbprint;
 
 #endif /* __KEYS_H__ */
 

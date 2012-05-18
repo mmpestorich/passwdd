@@ -24,6 +24,8 @@ DEALINGS IN THE SOFTWARE.
 #define __UTILS_H__
 
 
+extern const char *myHostname, *myAddress;
+
 void buffercatf(char *buffer, const char *format, ...);
 
 

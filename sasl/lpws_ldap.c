@@ -361,15 +361,6 @@ static int lpws_ldap_auxprop_init(const sasl_utils_t *utils,
 }
 
 
-//
-// Temporary.
-//
-int init_auxprop()
-{
-    return sasl_auxprop_add_plugin("lpws_ldap", lpws_ldap_auxprop_init);
-}
-
-
 int sasl_auxprop_plug_init(const sasl_utils_t *utils, int maxversion, int *out_version, sasl_auxprop_plug_t **plug, const char *plugname)
 {
     return lpws_ldap_auxprop_init(utils, maxversion, out_version, plug, plugname);

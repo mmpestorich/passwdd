@@ -40,9 +40,15 @@ typedef struct {
 extern int command_list(char *, int, char *argv[], Client *, void *);
 extern int command_rsapublic(char *, int, char *[], Client *, void *);
 extern int command_rsavalidate(char *, int, char *[], Client *, void *);
+extern int command_listreplicas(char *, int, char *[], Client *, void *);
+
+extern int command_newuser(char *, int, char *[], Client *, void *);
+extern int command_deleteuser(char *, int, char *[], Client *, void *);
+extern int command_changepass(char *, int, char *[], Client *, void *);
 extern int command_user(char *, int, char *[], Client *, void *);
 extern int command_auth(char *, int, char *[], Client *, void *);
 extern int command_auth2(char *, int, char *[], Client *, void *);
+
 extern int command_quit(char *, int, char *[], Client *, void *);
 
 extern ClientCommand clientCommands[];
