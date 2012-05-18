@@ -1,0 +1,33 @@
+#summary So how does this all work?
+
+= Initial run =
+
+Once everything is installed and configured you should have a single user in your OD ldap server called "Directory Administrator". This record will have a plain text password stored in _userPassword_ and it will, probably, have "*;basic;*" stored in the _authAuthority_ property. In Workgroup Manager this user will show as having a Crypt password.
+
+You will need to run *lpws -u -f* to have it walk all your users in your LDAP database and update them with a valid _authAuthority_ property. The *-u* parameter will tell it to update records, the *-f* parameter will tell it to overwrite any existing _authAuthority_ properties.
+
+Once that command is run you should have a valid "Open Directory" password for your Directory Administrator user.
+
+= Creating users =
+
+When you create users you will need to mark them as "Crypt" users and not "Open Directory" users. Here is why. When Workgroup Manager creates an initial user it sets the _userPassword_ property to "********" and sets the _authAuthority_ property. That is all great except we have some services that still need the _userPassword_ property to be valid. Worse, that means anybody can login as that user by entering "********" for the password (that is 8 asterisks).
+
+When you create a user with a "Crypt" password it stores the plaintext password in the _userPassword_ property. Then you run the *lpws -u* command and it will add an _authAuthority_ attribute to the user's record. You can setup a cron job to run the update command as often as you want. Every 5-10 minutes is probably plenty unless it is common for you to create a user while they are sitting there waiting to login. I usually create a user days before they ever show up to login.
+
+Now, when either the user changes their password or you force-set it via Workgroup Manager, the _userPassword_ attribute is left alone (so far). This means that you can change passwords that are marked as Open Directory users, you just have to wait for the *lpws* process to mark them as such.
+
+= How passwords are stored =
+
+As I said, passwords are stored in cleartext in the _userPassword_ attribute. There is also a _authAuthority_ attribute that many Mac OS X services use to determine how to do a secure authorization of the user. This means it is critical you secure the _userPassword_ attribute appropriately.
+
+= Future plans =
+
+I would like in the future to make the Linux Password Server work much like the Apple system does, where the passwords are stored in a different database all together for extra security. The main issue right now is this would require a (small) change to the OpenLDAP source code for the slapd daemon. The reason is that simple authentication will always use the _userPassword_ attribute, I can't find a way to override it to use another source for the password.
+
+With SASL authentication I _can_ have it use another source, so I considered just blocking simple authentication and requiring SASL. However, that method requires that the _userPassword_ attribute have a value like *{LPWS}diradmin* so that it knows the "user id" to authenticate with. The plug-in system only passes the _userPassword_ attribute, and seeing as it is (normally) "********" that doesn't really help me.
+
+The real issue is Workgroup Manager. I would have that that the password server would be the one to set information in the LDAP directory but it is Workgroup Manager, which means even if I set the _userPassword_ attribute to something like *{LPWS}diradmin* when a user is created, WGM would overwrite it with "********" once I return the "slot id" after creating the user.
+
+I am trying to make this easy to setup for other people, hence I don't want to start modifying the core and requiring that people keep a customized version of OpenLDAP installed.  Apple injects a small amount of code in the simple authentication that hijacks the authorization request if a valid _authAuthority_ attribute is present.  I have not found it yet, but I assume they do the same kind of thing in the SASL authentication area.
+
+The minor issue is Radius.  Right now it looks at the _userPassword_ attribute for authentication. I can work around that by writing a custom module similar to the LDAP module that retrieves the password from the password server, but there is no point doing that until I can authenticate against LDAP with an external password too.
