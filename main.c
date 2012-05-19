@@ -25,6 +25,8 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 #include <getopt.h>
 #include <sasl/sasl.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include "common.h"
 #include "client.h"
 #include "keys.h"
@@ -34,8 +36,8 @@ DEALINGS IN THE SOFTWARE.
 
 int doExit = 0;
 
-const char *myHostname = "ldap.infotest.hdcnet.org";
-const char *myAddress = "10.1.7.3";
+const char *myHostname = NULL;
+const char *myAddress = NULL;
 
 static void usage();
 
@@ -76,7 +78,7 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
     // If the value was not found and it is from the lpws_ldap plugin, then
     // to see if we have a generic version of the same.
     //
-    if (strcasecmp(plugin_name, "lpws_ldap") == 0) {
+    if (plugin_name != NULL && strcasecmp(plugin_name, "lpws_ldap") == 0) {
         snprintf(option_name, sizeof(option_name) - 1, "ldap_%s", option);
         value = find_config(option_name);
         if (value != NULL) {
@@ -113,6 +115,7 @@ static sasl_callback_t callbacks[] = {
 static struct option longopts[] = {
 	{ "config",	required_argument,	NULL,		'c' },
 	{ "update",	no_argument,		NULL,		'u' },
+	{ "force",	no_argument,		NULL,		'f' },
 	{ "help",	no_argument,		NULL,		'h' },
 	{ NULL,		0,			NULL,		0 }
 };
@@ -121,10 +124,10 @@ static struct option longopts[] = {
 int main(int argc, char *argv[])
 {
     const char *config_file = "/etc/lpws.conf";
-    int ch, updateAuth = 0;
+    int ch, updateAuth = 0, force = 0;
 
 
-    while ((ch = getopt_long(argc, argv, "c:h:u", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, "c:ufh", longopts, NULL)) != -1) {
         switch (ch) {
             case 'c':
                 config_file = optarg;
@@ -134,17 +137,49 @@ int main(int argc, char *argv[])
                 updateAuth = 1;
                 break;
 
+            case 'f':
+                force = 1;
+                break;
+
             case 'h':
             default:
                 usage();
         }
-
-        argc -= optind;
-        argv += optind;
     }
 
     if (init_config(config_file) == -1)
         exit(1);
+
+    //
+    // Get the hostname and primary IP address.
+    //
+    char *name, *address;
+
+    if (find_config("hostname") != NULL) {
+        name = strdup(find_config("hostname"));
+    }
+    else {
+        name = malloc(256);
+        if (gethostname(name, 256) != 0)
+            exit(1);
+    }
+    myHostname = name;
+
+    if (find_config("ipaddress") != NULL) {
+        address = strdup(find_config("ipaddress"));
+    }
+    else {
+        struct hostent *ent = gethostbyname(myHostname);
+        if (ent == NULL)
+            exit(1);
+        struct in_addr **addrs = (struct in_addr **)ent->h_addr_list;
+        if (addrs[0] == NULL)
+            exit(1);
+        address = strdup(inet_ntoa(addrs[0][0]));
+    }
+    myAddress = address;
+
+    printf("Running with local address %s:%s.\r\n", myHostname, myAddress);
 
     if (loadKeys() == -1)
         exit(1);
@@ -153,7 +188,7 @@ int main(int argc, char *argv[])
     // Make sure all the user records have a authAuthority record for us.
     //
     if (updateAuth == 1) {
-        ldap_updateAuthority(0);
+        ldap_updateAuthority(force);
         exit(0);
     }
 
@@ -196,7 +231,7 @@ static void usage()
 {
     printf("Usage:\r\n");
     printf("\tlpws [-c config]\r\n");
-    printf("\tlpws [-c config] -u\r\n");
+    printf("\tlpws [-c config] -u [-f]\r\n");
     exit(-1);
 }
 

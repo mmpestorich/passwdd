@@ -90,7 +90,7 @@ int loadKeys()
     //
     len = (5 + strlen(e) + 1 + strlen(m) + 1 + 5 + strlen(myHostname) + 1);
     publicKeyThumbprint = (const char *)malloc(len);
-    snprintf((char *)publicKeyThumbprint, len, "%d %s %s %s",
+    snprintf((char *)publicKeyThumbprint, len, "%d %s %s root@%s",
              BN_num_bits(privateKey->n), e, m, myHostname);
 
     //
