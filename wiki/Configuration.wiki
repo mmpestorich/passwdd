@@ -24,6 +24,8 @@ The available options used directly by the _lpws_ binary are:
  * *ldap_basedn* - The search base to use when looking up a user's record.
  * *ldap_binddn* - The DN to use when binding. This must be a DN that has access to read/write the userPassword and authAuthority attributes.
  * *ldap_bindpw* - The password to use when binding with the above DN.
+ * *hostname* - Override the detected hostname of the system.
+ * *ipaddress* - Override the resolved IP address of the hostname.
 
 Any SASL option can be set by prefixing the requested option name with sasl{{{_}}}. The LDAP auxprop module used by _lpws_ for retrieving the user's unencrypted password has the following options (if these options are not found then they will be searched for by just the *ldap{{{_}}}* prefix, i.e. *ldap_uri*):
  * *sasl_lpws_ldap_uri* - The URI used when connecting to the LDAP server.
