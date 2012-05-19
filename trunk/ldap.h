@@ -24,8 +24,11 @@ DEALINGS IN THE SOFTWARE.
 #define __LDAP_H__
 
 #include <stdio.h>
+#include <ldap.h>
 
 
+extern LDAP *ldap_connect(int bind);
+extern void ldap_disconnect(LDAP *ldap);
 extern char *ldap_replicalist();
 extern int ldap_updateAuthority();
 

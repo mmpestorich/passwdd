@@ -22,34 +22,46 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <ldap.h>
 #include <lber.h>
 #include "ldap.h"
 #include "keys.h"
 #include "config.h"
+#include "utils.h"
+
+
+#define BIND_RETRIES	5
 
 
 //
-// Retrieve a list of replica servers from the LDAP directory. The returned
-// string is in XML format and should be free'd by the caller.
+// Create a new connection to the LDAP server, optionally bind to the
+// server using the configured credentials.
 //
-char *ldap_replicalist()
+LDAP *ldap_connect(int bind)
 {
-    struct berval	**attrvalues;
-    LDAPMessage		*ldapresults = NULL, *ldapresult = NULL;
-    const char		*basedn, *uri;
-    char 		*xml = NULL, *attrlist[2];
+    struct berval	cred;
+    const char		*uri, *binddn = NULL, *bindpw = NULL;
     LDAP		*ldap = NULL;
-    int			result, version = 3;
+    int			i, version = 3, result;
 
 
     //
     // Get the config options we need to connect to the LDAP server.
     //
-    basedn = find_config("ldap_basedn");
     uri = find_config("ldap_uri");
-    if (basedn == NULL || uri == NULL)
-	return NULL;
+    if (uri == NULL)
+        return NULL;
+
+    //
+    // Get the config options we need to bind to the LDAP server.
+    //
+    if (bind) {
+        binddn = find_config("ldap_binddn");
+        bindpw = find_config("ldap_bindpw");
+        if (binddn == NULL || bindpw == NULL)
+            return NULL;
+    }
 
     //
     // Connect to the LDAP server.
@@ -66,6 +78,74 @@ char *ldap_replicalist()
     }
 
     //
+    // Try to bind if requested.
+    //
+    if (bind) {
+        cred.bv_val = malloc(strlen(bindpw) + 1);
+        strcpy(cred.bv_val, bindpw);
+        cred.bv_len = strlen(bindpw);
+        for (i = 0; i < BIND_RETRIES; i++) {
+            result = ldap_sasl_bind_s(ldap, binddn, LDAP_SASL_SIMPLE,
+                                      &cred, NULL, NULL, NULL);
+            if (result == LDAP_SUCCESS)
+                break;
+
+            printf("Failed to bind to LDAP server, error = %d\r\n", result);
+            sleep(2);
+        }
+        free(cred.bv_val);
+
+        //
+        // Check for failure to bind.
+        //
+        if (i == BIND_RETRIES) {
+            ldap_unbind_ext_s(ldap, NULL, NULL);
+            return NULL;
+        }
+    }
+
+    return ldap;
+}
+
+
+//
+// Disconnect from the LDAP server.
+//
+void ldap_disconnect(LDAP *ldap)
+{
+    if (ldap != NULL)
+        ldap_unbind_ext_s(ldap, NULL, NULL);
+}
+
+
+//
+// Retrieve a list of replica servers from the LDAP directory. The returned
+// string is in XML format and should be free'd by the caller.
+//
+char *ldap_replicalist()
+{
+    struct berval	**attrvalues;
+    LDAPMessage		*ldapresults = NULL, *ldapresult = NULL;
+    const char		*basedn;
+    char 		*xml = NULL, *attrlist[2];
+    LDAP		*ldap = NULL;
+    int			result;
+
+
+    //
+    // Get the config options we need to search the LDAP server.
+    //
+    basedn = find_config("ldap_basedn");
+    if (basedn == NULL)
+        return NULL;
+
+    //
+    // Get an LDAP connection.
+    //
+    if ((ldap = ldap_connect(0)) == NULL)
+        return NULL;
+
+    //
     // We want only a single attribute.
     //
     attrlist[0] = "apple-password-server-list";
@@ -78,7 +158,7 @@ char *ldap_replicalist()
                                "cn=passwordserver", attrlist, 0,
                                NULL, NULL, NULL, 1, &ldapresults);
     if (result != LDAP_SUCCESS) {
-        ldap_unbind_ext_s(ldap, NULL, NULL);
+        ldap_disconnect(ldap);
         return NULL;
     }
 
@@ -87,7 +167,7 @@ char *ldap_replicalist()
     //
     if ((ldapresult = ldap_first_entry(ldap, ldapresults)) == NULL) {
         ldap_msgfree(ldapresults);
-        ldap_unbind_ext_s(ldap, NULL, NULL);
+        ldap_disconnect(ldap);
 
         return NULL;
     }
@@ -98,7 +178,7 @@ char *ldap_replicalist()
     attrvalues = ldap_get_values_len(ldap, ldapresult, "apple-password-server-list");
     if (attrvalues == NULL || attrvalues[0] == NULL) {
         ldap_msgfree(ldapresults);
-        ldap_unbind_ext_s(ldap, NULL, NULL);
+        ldap_disconnect(ldap);
 
         return NULL;
     }
@@ -114,7 +194,7 @@ char *ldap_replicalist()
     // Close the LDAP connection.
     //
     ldap_msgfree(ldapresults);
-    ldap_unbind_ext_s(ldap, NULL, NULL);
+    ldap_disconnect(ldap);
 
     return xml;
 }
@@ -125,8 +205,139 @@ char *ldap_replicalist()
 // attribute. If the force parameter is set then all records that have
 // an authAuthority attribute will be deleted and updated.
 //
+// Returns 0 on success or a negative number to indicate a fatal error
+// that prevented us from doing anything. A positive number is returned
+// to indicate how many records had errors of some kind.
+//
 int ldap_updateAuthority(int force)
 {
+    struct berval	**attrvalues;
+    LDAPMessage		*ldapresults = NULL, *ldapresult = NULL;
+    const char		*basedn, *query;
+    char 		*attrlist[4], *authAuthority, *uid, *userPassword;
+    LDAP		*ldap = NULL;
+    int			result, errors = 0, len;
+
+
+    //
+    // Get the config options we need to search the LDAP server.
+    //
+    basedn = find_config("ldap_basedn");
+    if (basedn == NULL)
+        return -1;
+
+    //
+    // Get an LDAP connection.
+    //
+    if ((ldap = ldap_connect(1)) == NULL)
+        return -1;
+
+    //
+    // We want only a single attribute.
+    //
+    attrlist[0] = "uid";
+    attrlist[1] = "userPassword";
+    attrlist[2] = NULL;
+    attrlist[3] = NULL;
+
+    //
+    // If we are forcing an update then just search for any person record,
+    // otherwise search for any person record that does not have a authAuthority.
+    //
+    if (force)
+        query = "(&(objectClass=person)(uid=*))";
+    else
+        query = "(&(objectClass=person)(uid=*)(!authAuthority=*))";
+
+    //
+    // Search the LDAP database for the wanted records.
+    // Only take the first 1,000 records. If you have more, uhh, too bad?
+    //
+    result = ldap_search_ext_s(ldap, basedn, LDAP_SCOPE_SUBTREE,
+                               query, attrlist, 0,
+                               NULL, NULL, NULL, 1000, &ldapresults);
+    if (result != LDAP_SUCCESS) {
+        ldap_disconnect(ldap);
+        return -1;
+    }
+
+    //
+    // Go through each returned person record and process it accordingly.
+    //
+    for (ldapresult = ldap_first_entry(ldap, ldapresults);
+         ldapresult != NULL;
+         ldapresult = ldap_next_entry(ldap, ldapresult)) {
+        //
+        // Mark the fields as unknown to begin with.
+        //
+        uid = NULL;
+        userPassword = NULL;
+
+        //
+        // Retrieve the first uid attribute.
+        //
+        attrvalues = ldap_get_values_len(ldap, ldapresult, "uid");
+        if (attrvalues != NULL && attrvalues[0] != NULL) {
+            uid = malloc(attrvalues[0]->bv_len + 1);
+            memcpy(uid, attrvalues[0]->bv_val, attrvalues[0]->bv_len);
+            uid[attrvalues[0]->bv_len] = '\0';
+        }
+
+        //
+        // Retrieve the first userPassword attribute.
+        //
+        attrvalues = ldap_get_values_len(ldap, ldapresult, "userPassword");
+        if (attrvalues != NULL && attrvalues[0] != NULL) {
+            userPassword = malloc(attrvalues[0]->bv_len + 1);
+            memcpy(userPassword, attrvalues[0]->bv_val, attrvalues[0]->bv_len);
+            userPassword[attrvalues[0]->bv_len] = '\0';
+        }
+
+        //
+        // Check for missing values.
+        //
+        if (uid == NULL || userPassword == NULL) {
+            free(uid);
+            free(userPassword);
+            errors += 1;
+
+            continue;
+        }
+
+        //
+        // Perform a security check on the userPassword, make sure it hasn't
+        // been tampered with by WGM.
+        //
+        if (strcmp(userPassword, "********") == 0) {
+            free(uid);
+            free(userPassword);
+            errors += 1;
+            printf("Security Warning: User %s's password has been set to '********' by Workgroup Manager.\r\n", uid);
+
+            continue;
+        }
+
+        //
+        // Generate a proper authAuthority and set it.
+        //
+        len = strlen(publicKeyThumbprint) + strlen(uid) + 64;
+        authAuthority = malloc(len);
+        snprintf(authAuthority, len, ";ApplePasswordServer;%s,%s:%s",
+                 uid, publicKeyThumbprint, myAddress);
+
+        printf("%s\r\n", authAuthority);
+        free(authAuthority);
+        free(uid);
+        free(userPassword);
+    }
+
+    //
+    // Close the LDAP connection.
+    //
+    ldap_msgfree(ldapresults);
+    ldap_disconnect(ldap);
+
+    return errors;
 //";ApplePasswordServer;<uid>,<public thumbprint>:<myipaddress>"
 }
 
