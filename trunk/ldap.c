@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 #include "keys.h"
 #include "config.h"
 #include "utils.h"
+#include "common.h"
 
 
 #define BIND_RETRIES	5
@@ -214,7 +215,7 @@ int ldap_updateAuthority(int force)
     struct berval	**attrvalues;
     LDAPMessage		*ldapresults = NULL, *ldapresult = NULL;
     const char		*basedn, *query;
-    char 		*attrlist[4], *authAuthority, *uid, *userPassword;
+    char 		*attrlist[4], *dn, *authAuthority, *uid, *userPassword;
     LDAP		*ldap = NULL;
     int			result, errors = 0, len;
 
@@ -247,7 +248,7 @@ int ldap_updateAuthority(int force)
     if (force)
         query = "(&(objectClass=person)(uid=*))";
     else
-        query = "(&(objectClass=person)(uid=*)(!authAuthority=*))";
+        query = "(&(objectClass=person)(uid=*)(!(authAuthority=*)))";
 
     //
     // Search the LDAP database for the wanted records.
@@ -273,6 +274,11 @@ int ldap_updateAuthority(int force)
         uid = NULL;
         userPassword = NULL;
 
+        dn = ldap_get_dn(ldap, ldapresult);
+#ifdef DEBUG
+        printf("Processing record %s\r\n", (dn ? dn : ""));
+#endif
+
         //
         // Retrieve the first uid attribute.
         //
@@ -297,6 +303,7 @@ int ldap_updateAuthority(int force)
         // Check for missing values.
         //
         if (uid == NULL || userPassword == NULL) {
+            ldap_memfree(dn);
             free(uid);
             free(userPassword);
             errors += 1;
@@ -309,6 +316,7 @@ int ldap_updateAuthority(int force)
         // been tampered with by WGM.
         //
         if (strcmp(userPassword, "********") == 0) {
+            ldap_memfree(dn);
             free(uid);
             free(userPassword);
             errors += 1;
@@ -326,6 +334,7 @@ int ldap_updateAuthority(int force)
                  uid, publicKeyThumbprint, myAddress);
 
         printf("%s\r\n", authAuthority);
+        ldap_memfree(dn);
         free(authAuthority);
         free(uid);
         free(userPassword);
