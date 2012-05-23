@@ -24,9 +24,9 @@ As I said, passwords are stored in cleartext in the _userPassword_ attribute. Th
 
 I would like in the future to make the Linux Password Server work much like the Apple system does, where the passwords are stored in a different database all together for extra security. The main issue right now is this would require a (small) change to the OpenLDAP source code for the slapd daemon. The reason is that simple authentication will always use the _userPassword_ attribute, I can't find a way to override it to use another source for the password.
 
-With SASL authentication I _can_ have it use another source, so I considered just blocking simple authentication and requiring SASL. However, that method requires that the _userPassword_ attribute have a value like *{LPWS}diradmin* so that it knows the "user id" to authenticate with. The plug-in system only passes the _userPassword_ attribute, and seeing as it is (normally) "********" that doesn't really help me.
+With SASL authentication I _can_ have it use another source, so I considered just blocking simple authentication and requiring SASL. However, that method requires that the _userPassword_ attribute have a value like *{LPWS}diradmin* so that it knows the "user id" to authenticate with. The plug-in system only passes the _userPassword_ attribute, and seeing as it is (normally) "{{{********}}}" that doesn't really help me.
 
-The real issue is Workgroup Manager. I would have designed it so that the password server would be the one to set information in the LDAP directory but it is Workgroup Manager, which means even if I set the _userPassword_ attribute to something like *{LPWS}diradmin* when a user is created, WGM would overwrite it with "********" once I return the "slot id" after creating the user. In reality, I believe this is because during the call the NEWUSER on the password server the OD record does not yet exist, so I couldn't even set it even if WGM did not make it "********".
+The real issue is Workgroup Manager. I would have designed it so that the password server would be the one to set information in the LDAP directory but it is Workgroup Manager, which means even if I set the _userPassword_ attribute to something like *{LPWS}diradmin* when a user is created, WGM would overwrite it with "{{{********}}}" once I return the "slot id" after creating the user. In reality, I believe this is because during the call the NEWUSER on the password server the OD record does not yet exist, so I couldn't even set it even if WGM did not make it "{{{********}}}".
 
 I am trying to make this easy to setup for other people, hence I don't want to start modifying the core and requiring that people keep a customized version of OpenLDAP installed.  Apple injects a small amount of code in the simple authentication that hijacks the authorization request if a valid _authAuthority_ attribute is present.  I have not found it yet, but I assume they do the same kind of thing in the SASL authentication area.
 
@@ -34,9 +34,9 @@ The minor issue is Radius.  Right now it looks at the _userPassword_ attribute f
 
 = First possible solution to creating an OD user =
 
-One possible solution would be to see if I can write a password scheme module to "trick" slapd into thinking it handles passwords with "********" and then always return a "access denied" message. This would catch any "holes" in the process between a user being created with "********" and the real password info being setup.
+One possible solution would be to see if I can write a password scheme module to "trick" slapd into thinking it handles passwords with "{{{********}}}" and then always return a "access denied" message. This would catch any "holes" in the process between a user being created with "{{{********}}}" and the real password info being setup.
 
-Then have a cron-job run every minute that checks if a userPassword attribute is "********" and sets it to what the real password should be (this would require the lpws system to keep a duplicate password database).
+Then have a cron-job run every minute that checks if a userPassword attribute is "{{{********}}}" and sets it to what the real password should be (this would require the lpws system to keep a duplicate password database).
 
 Because of the dual-password issue I'm not too keen on this solution, but it might be the quickest route at the moment.
 
