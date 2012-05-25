@@ -215,7 +215,9 @@ int ldap_updateAuthority(int force)
     struct berval	**attrvalues;
     LDAPMessage		*ldapresults = NULL, *ldapresult = NULL;
     const char		*basedn, *query;
-    char 		*attrlist[4], *dn, *authAuthority, *uid, *userPassword;
+    LDAPMod		modOp, *modUser[2] = { &modOp, NULL };
+    char 		*attrlist[4], *dn, *authAuthority, *uid,
+			*userPassword, *modValues[2];
     LDAP		*ldap = NULL;
     int			result, errors = 0, len;
 
@@ -224,14 +226,22 @@ int ldap_updateAuthority(int force)
     // Get the config options we need to search the LDAP server.
     //
     basedn = find_config("ldap_basedn");
-    if (basedn == NULL)
+    if (basedn == NULL) {
+#ifdef DEBUG
+        printf("No search base configured.\r\n");
+#endif
         return -1;
+    }
 
     //
     // Get an LDAP connection.
     //
-    if ((ldap = ldap_connect(1)) == NULL)
+    if ((ldap = ldap_connect(1)) == NULL) {
+#ifdef DEBUG
+        printf("Could not connect to LDAP server.\r\n");
+#endif
         return -1;
+    }
 
     //
     // We want only a single attribute.
@@ -258,6 +268,9 @@ int ldap_updateAuthority(int force)
                                query, attrlist, 0,
                                NULL, NULL, NULL, 1000, &ldapresults);
     if (result != LDAP_SUCCESS) {
+#ifdef DEBUG
+        printf("LDAP search request failed: %s.\r\n", ldap_err2string(result));
+#endif
         ldap_disconnect(ldap);
         return -1;
     }
@@ -303,6 +316,9 @@ int ldap_updateAuthority(int force)
         // Check for missing values.
         //
         if (uid == NULL || userPassword == NULL) {
+#ifdef DEBUG
+            printf("Record %s has either no uid or no userPassword attribute.\r\n", dn);
+#endif
             ldap_memfree(dn);
             free(uid);
             free(userPassword);
@@ -316,6 +332,9 @@ int ldap_updateAuthority(int force)
         // been tampered with by WGM.
         //
         if (strcmp(userPassword, "********") == 0) {
+#ifdef DEBUG
+            printf("Record %s has an invalid password.\r\n", dn);
+#endif
             ldap_memfree(dn);
             free(uid);
             free(userPassword);
@@ -333,7 +352,47 @@ int ldap_updateAuthority(int force)
         snprintf(authAuthority, len, ";ApplePasswordServer;%s,%s:%s",
                  uid, publicKeyThumbprint, myAddress);
 
-        printf("%s\r\n", authAuthority);
+        //
+        // Run an LDAP modification request to remove any existing
+        // authAuthority attribute if we are in force mode.
+        //
+        result = LDAP_SUCCESS;
+        if (force) {
+            modOp.mod_op = LDAP_MOD_DELETE;
+            modOp.mod_type = "authAuthority";
+            modOp.mod_values = NULL;
+            result = ldap_modify_ext_s(ldap, dn, modUser, NULL, NULL);
+            if (result != LDAP_SUCCESS && result != LDAP_NO_SUCH_ATTRIBUTE) {
+#ifdef DEBUG
+                printf("Could not remove authAuthority attribute for record %s: %s.\r\n",
+                       dn, ldap_err2string(result));
+#endif
+                errors += 1;
+            }
+        }
+
+        //
+        // Run an LDAP modifiction request to add the new attribute.
+        //
+        if (result == LDAP_SUCCESS || result == LDAP_NO_SUCH_ATTRIBUTE) {
+            modOp.mod_op = LDAP_MOD_ADD;
+            modOp.mod_type = "authAuthority";
+            modOp.mod_values = modValues;
+            modValues[0] = authAuthority;
+            modValues[1] = NULL;
+            result = ldap_modify_ext_s(ldap, dn, modUser, NULL, NULL);
+            if (result != LDAP_SUCCESS) {
+#ifdef DEBUG
+                printf("Failed to add authAuthority attribute for record %s: %s.\r\n",
+                       dn, ldap_err2string(result));
+#endif
+                errors += 1;
+            }
+        }
+
+        //
+        // Free up memory used by this iteration.
+        //
         ldap_memfree(dn);
         free(authAuthority);
         free(uid);
