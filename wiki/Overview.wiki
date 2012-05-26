@@ -10,7 +10,7 @@ Once that command is run you should have a valid "Open Directory" password for y
 
 = Creating users =
 
-When you create users you will need to mark them as "Crypt" users and not "Open Directory" users. Here is why. When Workgroup Manager creates an initial user it sets the _userPassword_ property to "********" and sets the _authAuthority_ property. That is all great except we have some services that still need the _userPassword_ property to be valid. Worse, that means anybody can login as that user by entering "********" for the password (that is 8 asterisks).
+When you create users you will need to mark them as "Crypt" users and not "Open Directory" users. Here is why. When Workgroup Manager creates an initial user it sets the _userPassword_ property to "`********`" and sets the _authAuthority_ property. That is all great except we have some services that still need the _userPassword_ property to be valid. Worse, that means anybody can login as that user by entering "`********`" for the password (that is 8 asterisks).
 
 When you create a user with a "Crypt" password it stores the plaintext password in the _userPassword_ property. Then you run the *lpws -u* command and it will add an _authAuthority_ attribute to the user's record. You can setup a cron job to run the update command as often as you want. Every 5-10 minutes is probably plenty unless it is common for you to create a user while they are sitting there waiting to login. I usually create a user days before they ever show up to login.
 
@@ -24,9 +24,9 @@ As I said, passwords are stored in cleartext in the _userPassword_ attribute. Th
 
 I would like in the future to make the Linux Password Server work much like the Apple system does, where the passwords are stored in a different database all together for extra security. The main issue right now is this would require a (small) change to the OpenLDAP source code for the slapd daemon. The reason is that simple authentication will always use the _userPassword_ attribute, I can't find a way to override it to use another source for the password.
 
-With SASL authentication I _can_ have it use another source, so I considered just blocking simple authentication and requiring SASL. However, that method requires that the _userPassword_ attribute have a value like *{LPWS}diradmin* so that it knows the "user id" to authenticate with. The plug-in system only passes the _userPassword_ attribute, and seeing as it is (normally) "{{{********}}}" that doesn't really help me.
+With SASL authentication I _can_ have it use another source, so I considered just blocking simple authentication and requiring SASL. However, that method requires that the _userPassword_ attribute have a value like *{LPWS}diradmin* so that it knows the "user id" to authenticate with. The plug-in system only passes the _userPassword_ attribute, and seeing as it is (normally) "`********`" that doesn't really help me.
 
-The real issue is Workgroup Manager. I would have designed it so that the password server would be the one to set information in the LDAP directory but it is Workgroup Manager, which means even if I set the _userPassword_ attribute to something like *{LPWS}diradmin* when a user is created, WGM would overwrite it with "{{{********}}}" once I return the "slot id" after creating the user. In reality, I believe this is because during the call the NEWUSER on the password server the OD record does not yet exist, so I couldn't even set it even if WGM did not make it "{{{********}}}".
+The real issue is Workgroup Manager. I would have designed it so that the password server would be the one to set information in the LDAP directory but it is Workgroup Manager, which means even if I set the _userPassword_ attribute to something like *{LPWS}diradmin* when a user is created, WGM would overwrite it with "`********`" once I return the "slot id" after creating the user. In reality, I believe this is because during the call the NEWUSER on the password server the OD record does not yet exist, so I couldn't even set it even if WGM did not make it "`********`".
 
 I am trying to make this easy to setup for other people, hence I don't want to start modifying the core and requiring that people keep a customized version of OpenLDAP installed.  Apple injects a small amount of code in the simple authentication that hijacks the authorization request if a valid _authAuthority_ attribute is present.  I have not found it yet, but I assume they do the same kind of thing in the SASL authentication area.
 
@@ -34,9 +34,9 @@ The minor issue is Radius.  Right now it looks at the _userPassword_ attribute f
 
 = First possible solution to creating an OD user =
 
-One possible solution would be to see if I can write a password scheme module to "trick" slapd into thinking it handles passwords with "{{{********}}}" and then always return a "access denied" message. This would catch any "holes" in the process between a user being created with "{{{********}}}" and the real password info being setup.
+One possible solution would be to see if I can write a password scheme module to "trick" slapd into thinking it handles passwords with "`********`" and then always return a "access denied" message. This would catch any "holes" in the process between a user being created with "`********`" and the real password info being setup.
 
-Then have a cron-job run every minute that checks if a userPassword attribute is "{{{********}}}" and sets it to what the real password should be (this would require the lpws system to keep a duplicate password database).
+Then have a cron-job run every minute that checks if a userPassword attribute is "`********`" and sets it to what the real password should be (this would require the lpws system to keep a duplicate password database).
 
 Because of the dual-password issue I'm not too keen on this solution, but it might be the quickest route at the moment.
 
@@ -47,3 +47,20 @@ The second possible solution would take a bit more work and would leave the sour
  # Create a "subclass" of the *hdb* LDAP database backend module that adds in the required OD authentication code, i.e. redirecting that to the password server.
  # Create a RADIUS plug-in to interface with the password server to retrieve the plaintext password (maybe add a GETPASS command to the system that works after an Admin user is authenticated).
  # Update the password server to store passwords in a secure place.
+
+= Third possible solution (currently trying to implement) =
+
+This solution is a mix of the previous two. Basically we block openldap from allowing anybody to authenticate with a password that is "`********`" so we don't have to worry about that backdoor access between an OD user being created and the *lpws -u* command running.
+
+Then we provide an auxprop plugin for cyrus-sasl that will retrieve the password from the protected database.  This means that any process doing SASL authentication and running as root can read the database, but if the process is root it can already read the database, no biggie. This provides SASL authentication to openldap.
+
+Finally we provide a plugin for FreeRADIUS that will function a lot like the Authorize section of the LDAP plugin. Check if the user exists in the *lpws* database and if it does retrieve the plaintext password and store it in the request. Then during authentication it can do all the normal secure authentication stuff.
+
+So, because WGM will be, I believe, setting up the authAuthority field in the database users will be able to connect and authenticate immediately via PasswordServer aware applications, such as the Login Window, AFP, etc. Radius should also work as it will talk directly to the *lpws* database to get the password. The only authentication that won't work immediately will be direct connections to LDAP, which shouldn't be a problem.
+
+ # ~~Create modules to disallow "`********`" as an authentication password, both for simple binds and SASL binds.~~ *Finished*
+ # Implement NEWUSER, CHANGEPASS and DELETEUSER to store/update/delete passwords from a secure datastore.
+ # Have the *lpws -u* process update the _userPassword_ attribute to a "hashed" format, e.g. *{LPWS}diradmin* so ldap binding works.
+ # Create a slapd module to handle validating the password for a simple bind operation (it will use the {LPWS} hash to determine the id of the user to validate).
+ # Create a cyrus auxprop plugin to retrieve the cleartext password from the *lpws* database or via a GETPASS command.
+ # Create a RADIUS plugin to either retrieve the cleartext password from the *lpws* database or via a GETPASS command.
