@@ -63,7 +63,7 @@ static lpws_attr global_attrs[] = {
 // unmodified, you should malloc() your orig string too.
 // Reference: http://stackoverflow.com/questions/779875/what-is-the-function-to-replace-string-in-c
 //
-char *str_replace(char *orig, const char *rep, const char *with)
+static char *str_replace(char *orig, const char *rep, const char *with)
 {
     char *result; // the return string
     char *ins;    // the next insert point
