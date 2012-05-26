@@ -63,4 +63,6 @@ So, because WGM will be, I believe, setting up the authAuthority field in the da
  # Have the *lpws -u* process update the _userPassword_ attribute to a "hashed" format, e.g. *{LPWS}diradmin* so ldap binding works.
  # Create a slapd module to handle validating the password for a simple bind operation (it will use the {LPWS} hash to determine the id of the user to validate).
  # Create a cyrus auxprop plugin to retrieve the cleartext password from the *lpws* database or via a GETPASS command.
+ # Update the slapd config to include an _olcModuleLoad_ attribute value of *lpws*.
+ # Update the slapd config to include an _olcSaslAuxProps_ attribute value of *"slapd lpws"* (including quotes).
  # Create a RADIUS plugin to either retrieve the cleartext password from the *lpws* database or via a GETPASS command.
