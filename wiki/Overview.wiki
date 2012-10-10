@@ -59,6 +59,7 @@ Finally we provide a plugin for FreeRADIUS that will function a lot like the Aut
 So, because WGM will be, I believe, setting up the authAuthority field in the database users will be able to connect and authenticate immediately via PasswordServer aware applications, such as the Login Window, AFP, etc. Radius should also work as it will talk directly to the *lpws* database to get the password. The only authentication that won't work immediately will be direct connections to LDAP, which shouldn't be a problem.
 
  # ~~Create modules to disallow "`********`" as an authentication password, both for simple binds and SASL binds.~~ *Finished*
+ # Update modules to catch {LPWS} password hash and do a lookup in the local password database.
  # Implement NEWUSER, CHANGEPASS and DELETEUSER to store/update/delete passwords from a secure datastore.
  # Have the *lpws -u* process update the _userPassword_ attribute to a "hashed" format, e.g. *{LPWS}diradmin* so ldap binding works.
  # Create a slapd module to handle validating the password for a simple bind operation (it will use the {LPWS} hash to determine the id of the user to validate).
