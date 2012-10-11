@@ -16,6 +16,8 @@ When you create a user with a "Crypt" password it stores the plaintext password 
 
 Now, when either the user changes their password or you force-set it via Workgroup Manager, the _userPassword_ attribute is left alone (so far). This means that you can change passwords that are marked as Open Directory users, you just have to wait for the *lpws* process to mark them as such.
 
+The trouble with performing authentication via SASL/LDAP is all the plugin options for OpenLDAP do not provide the DN of the record being worked with. They just say things like "Here is *some* hashed password, validate this cleartext password against it". Basically I don't have access to query the authAuthority (if it exists) attribute to determine if we need to authenticate against a password server, and if so which server to authenticate with. My best option is to hard code (via config file) the address of the password server and the login credentials of the password server and query it directly.
+
 = How passwords are stored =
 
 As I said, passwords are stored in cleartext in the _userPassword_ attribute. There is also a _authAuthority_ attribute that many Mac OS X services use to determine how to do a secure authorization of the user. This means it is critical you secure the _userPassword_ attribute appropriately.
