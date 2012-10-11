@@ -60,9 +60,9 @@ So, because WGM will be, I believe, setting up the authAuthority field in the da
 
  # ~~Create modules to disallow "`********`" as an authentication password, both for simple binds and SASL binds.~~ *Finished*
  # Implement NEWUSER, CHANGEPASS and DELETEUSER to store/update/delete passwords from a secure datastore.
- # Have the *lpws -u* process update the _userPassword_ attribute to a "hashed" format, e.g. *{LPWS}diradmin* so ldap binding works.
+ # ~~Have the *lpws -u* process update the _userPassword_ attribute to a "hashed" format, e.g. *{LPWS}diradmin* so ldap binding works.~~ *Finished*
  # Create a slapd module to handle validating the password for a simple bind operation (it will use the {LPWS} hash to determine the id of the user to validate).
  # Create a cyrus auxprop plugin to retrieve the cleartext password from the *lpws* database or via a GETPASS command.
- # ~~Update the slapd config to include an _olcModuleLoad_ attribute value of *lpws* in the cn=module{0} tree.~~
- # ~~Update the slapd config to include an _olcSaslAuxProps_ attribute value of *"slapd lpws"* (including quotes) in the cn=config tree.~~.
+ # ~~Update the slapd config to include an _olcModuleLoad_ attribute value of *lpws* in the cn=module{0} tree.~~ *Finished*
+ # ~~Update the slapd config to include an _olcSaslAuxProps_ attribute value of *"slapd lpws"* (including quotes) in the cn=config tree.~~. *Finished*
  # Create a RADIUS plugin to either retrieve the cleartext password from the *lpws* database or via a GETPASS command.
