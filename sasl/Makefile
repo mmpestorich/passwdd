@@ -12,7 +12,7 @@ PLUGIN_DIR = /usr/lib/sasl2
 endif
 LIBTOOL = libtool
 
-all: libwebdavdigest.la libdhx.la liblpws_ldap.la liblpws.la
+all: libwebdavdigest.la libdhx.la liblpws_ldap.la liblpws.la libmschap.la
 
 libwebdavdigest.la: webdavdigest.lo webdavdigest_init.lo
 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -module -rpath $(PLUGIN_DIR) -o $@ $^ $(LDFLAGS)
@@ -26,6 +26,9 @@ liblpws.la: lpws.lo
 libdhx.la: dhx.lo dhx_init.lo
 	$(LIBTOOL) --mode=link $(CPP) $(CFLAGS) -module -rpath $(PLUGIN_DIR) -o $@ $^ $(LDFLAGS)
 
+libmschap.la: mschap.lo mschap_init.lo
+	$(LIBTOOL) --mode=link $(CPP) $(CFLAGS) -module -rpath $(PLUGIN_DIR) -o $@ $^ $(LDFLAGS)
+
 %.lo: %.c
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c $<
 
@@ -34,7 +37,7 @@ libdhx.la: dhx.lo dhx_init.lo
 
 install/%.la: %.la
 	$(LIBTOOL) --mode=install install -D -c $(notdir $@) $(DESTDIR)$(PLUGIN_DIR)/$(notdir $@)
-install: $(addprefix install/,libwebdavdigest.la) $(addprefix install/,libdhx.la) $(addprefix install/,liblpws_ldap.la) $(addprefix install/,liblpws.la)
+install: $(addprefix install/,libwebdavdigest.la) $(addprefix install/,libdhx.la) $(addprefix install/,liblpws_ldap.la) $(addprefix install/,liblpws.la) $(addprefix install/,libmschap.la)
 	$(LIBTOOL) --mode=finish $(DESTDIR)$(PLUGIN_DIR)
 
 clean:
