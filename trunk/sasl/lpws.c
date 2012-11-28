@@ -90,6 +90,7 @@ static void lpws_auxprop_lookup(void *glob_context,
     // If we get here then either no SASL_AUX_PASSWORD property has been
     // found yet or it was invalid, so we need to do our own lookup.
     //
+// TODO, look up the password in the password database.
 //    sparams->utils->prop_erase(sparams->propctx, SASL_AUX_PASSWORD);
 //    sparams->utils->prop_set(sparams->propctx, SASL_AUX_PASSWORD, "test", 4);
 }
