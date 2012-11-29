@@ -22,6 +22,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <sasl/sasl.h>
 #include <sasl/saslutil.h>
 #include <limits.h>
@@ -173,7 +174,10 @@ int command_listreplicas(char *response, int argc, char *argv[], Client *client,
     // checks if there is a "final" \r\n and adds it if there isn't, I don't know
     // just yet.
     //
-    buffercatf(response, "+OK %d %s", strlen(xml), xml);
+    // Suddenly things are not working if I don't include the \r\n.  Will have to
+    // study further.
+    //
+    buffercatf(response, "+OK %d %s\r\n", strlen(xml), xml);
 
     return 0;
 }
@@ -369,28 +373,36 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
                                &out, &outlen);
 
     //
-    // If result is SASL_OK then we are finished.
+    // If SASL_CONTINUE then we need to send some data to the client
+    // so that it can continue the process.
     //
-    if (result == SASL_OK) {
-        printf("Authenticated user %s using %s\r\n", client->username, argv[1]);
-        buffercatf(response, "+OK\r\n");
+    if (result == SASL_CONTINUE || result == SASL_OK) {
+        if (out != NULL && outlen != 0) {
+            char hex[BUFFER_SIZE];
+
+            binaryToHex((unsigned char *)out, outlen, hex);
+            if ((long)context == 1)
+                buffercatf(response, "+AUTHOK %s\r\n", hex);
+            else
+                buffercatf(response, "+OK %s\r\n", hex);
+        }
+        else {
+            if ((long)context == 1)
+                buffercatf(response, "+AUTHOK\r\n");
+            else
+                buffercatf(response, "+OK\r\n");
+        }
+
+        if (result == SASL_OK)
+            printf("Authenticated user %s using %s\r\n", client->username, argv[1]);
 
         return args;
     }
 
     //
-    // If SASL_CONTINUE then we need to send some data to the client
-    // so that it can continue the process.
+    // If result is SASL_OK then we are finished.
     //
-    if (result == SASL_CONTINUE) {
-        char hex[BUFFER_SIZE];
-
-        binaryToHex((unsigned char *)out, outlen, hex);
-        if ((long)context == 1)
-            buffercatf(response, "+AUTHOK %s\r\n", hex);
-        else
-            buffercatf(response, "+OK %s\r\n", hex);
-
+    if (result == SASL_OK) {
         return args;
     }
 
