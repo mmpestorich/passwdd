@@ -328,23 +328,6 @@ int ldap_updateAuthority(int force)
         }
 
         //
-        // Perform a security check on the userPassword, make sure it hasn't
-        // been tampered with by WGM.
-        //
-        if (strcmp(userPassword, "********") == 0) {
-#ifdef DEBUG
-            printf("Record %s has an invalid password.\r\n", dn);
-#endif
-            ldap_memfree(dn);
-            free(uid);
-            free(userPassword);
-            errors += 1;
-            printf("Security Warning: User %s's password has been set to '********' by Workgroup Manager.\r\n", uid);
-
-            continue;
-        }
-
-        //
         // Generate a proper authAuthority and set it.
         //
         len = strlen(publicKeyThumbprint) + strlen(uid) + 64;
@@ -384,6 +367,29 @@ int ldap_updateAuthority(int force)
             if (result != LDAP_SUCCESS) {
 #ifdef DEBUG
                 printf("Failed to add authAuthority attribute for record %s: %s.\r\n",
+                       dn, ldap_err2string(result));
+#endif
+                errors += 1;
+            }
+        }
+
+        //
+        // Run an LDAP request to replace the userPassword.
+        //
+        if (result == LDAP_SUCCESS || result == LDAP_NO_SUCH_ATTRIBUTE) {
+            free(authAuthority);
+            len = strlen(uid) + 6 + 1;
+            authAuthority = malloc(len);
+            snprintf(authAuthority, len, "{LPWS}%s", uid);
+            modOp.mod_op = LDAP_MOD_REPLACE;
+            modOp.mod_type = "userPassword";
+            modOp.mod_values = modValues;
+            modValues[0] = authAuthority;
+            modValues[1] = NULL;
+            result = ldap_modify_ext_s(ldap, dn, modUser, NULL, NULL);
+            if (result != LDAP_SUCCESS) {
+#ifdef DEBUG
+                printf("Failed to replace userPassword attribute for record %s: %s.\r\n",
                        dn, ldap_err2string(result));
 #endif
                 errors += 1;
