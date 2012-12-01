@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 #include <getopt.h>
 #include <sasl/sasl.h>
+#include <signal.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "common.h"
@@ -32,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 #include "keys.h"
 #include "config.h"
 #include "listener.h"
+#include "pwdb.h"
 #include "ldap.h"
 
 int doExit = 0;
@@ -40,6 +42,16 @@ const char *myHostname = NULL;
 const char *myAddress = NULL;
 
 static void usage();
+
+
+//
+// Catch signals that we should exit for.
+//
+void terminate(int signum)
+{
+    fprintf(stderr, "Got signal %d, exiting...\r\n", signum);
+    doExit = 1;
+}
 
 
 //
@@ -61,7 +73,7 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
     option_name[sizeof(option_name) - 1] = '\0';
 
 #ifdef DEBUG
-    printf("CyrusOption: %s\r\n", option_name);
+//    printf("CyrusOption: %s\r\n", option_name);
 #endif
 
     //
@@ -181,14 +193,23 @@ int main(int argc, char *argv[])
 
     printf("Running with local address %s:%s.\r\n", myHostname, myAddress);
 
+    //
+    // Catch a kill and CTRL-C.
+    //
+    signal(SIGTERM, terminate);
+    signal(SIGINT, terminate);
+
     if (loadKeys() == -1)
         exit(1);
+    if (pwdb_open() != 0)
+	exit(1);
 
     //
     // Make sure all the user records have a authAuthority record for us.
     //
     if (updateAuth == 1) {
         ldap_updateAuthority(force);
+	pwdb_close();
         exit(0);
     }
 
@@ -196,11 +217,13 @@ int main(int argc, char *argv[])
 
     if (sasl_server_init(callbacks, "PasswordServer") != SASL_OK) {
         printf("Failed to initialize SASL.\r\n");
+	pwdb_close();
         exit(1);
     }
 
     if (setupListeners() == -1) {
         printf("Failed to setup server sockets.\r\n");
+	pwdb_close();
         exit(1);
     }
 
@@ -219,6 +242,11 @@ int main(int argc, char *argv[])
     // Close all server sockets.
     //
     closeListeners();
+
+    //
+    // Close database.
+    //
+    pwdb_close();
     
     return 0;
 }

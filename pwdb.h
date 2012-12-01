@@ -20,30 +20,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __CLIENT_H__
-#define __CLIENT_H__
+#ifndef __PWDB_H__
+#define __PWDB_H__
 
-#include <sys/select.h>
-#include <sasl/sasl.h>
-#include "common.h"
-
-
-typedef struct {
-    int fd;
-    char username[USERNAME_MAX + 1];
-    sasl_conn_t *sasl;
-} Client;
+#include <stdio.h>
+#include <stdint.h>
 
 
-extern void init_client();
+typedef struct PasswordRec aPasswordRec;
 
-extern int setup_clients_fdset(fd_set *read_fds);
-extern void process_clients(fd_set *read_fds);
-extern void process_client(int fd);
+extern int  pwdb_open();
+extern void pwdb_close();
 
-extern Client *add_client(int fd, sasl_conn_t *sasl);
-extern void destroy_client(int fd);
-extern Client *find_client(int fd);
+extern int  pwdb_adduser(const char *username, const char *password, uint32_t flags);
+extern int  pwdb_updatepassword(const char *username, const char *password);
+extern int  pwdb_updateflags(const char *username, uint32_t flags);
+extern int  pwdb_deleteuser(const char *username);
+extern int  pwdb_getpassword(const char *username, char *password, int password_size);
 
-#endif /* __CLIENT_H__ */
+#endif /* __PWDB_H__ */
 

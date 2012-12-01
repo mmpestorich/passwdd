@@ -23,12 +23,17 @@ static int chk_blacklist(
 }
 
 
+//
+// This method will need to perform an authenticated check on the user's
+// actual password which is stored in the password server's database.
+//
 static int chk_lpws(
 	const struct berval *scheme,
 	const struct berval *passwd,
 	const struct berval *cred,
 	const char **text)
 {
+    return 0;
     return LUTIL_PASSWD_ERR;
 }
 
