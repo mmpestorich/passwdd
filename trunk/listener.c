@@ -264,6 +264,9 @@ int poll_sockets()
     // Wait for activity.
     //
     if (select(maxfd + 1, &read_fds, NULL, NULL, &timeout) == -1) {
+	if (errno == EINTR)
+	    return 0;
+
         printf("errno = %d\r\n", errno);
         return -1;
     }

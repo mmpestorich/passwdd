@@ -24,8 +24,10 @@ DEALINGS IN THE SOFTWARE.
 #define __COMMON_H__
 
 
+#define USERNAME_MAX    63
+#define PASSWORD_MAX	127
+
 #define LISTENER_MAX    32
-#define USERNAME_MAX    64
 #define CLIENT_MAX      64
 #define BUFFER_SIZE     1024
 #define ARGS_MAX        32
