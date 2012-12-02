@@ -9,10 +9,10 @@ These are the commands that are known to work so far:
   * USER - specify username to authenticate as.
   * AUTH - Step 1 authentication.
   * AUTH2 - Step 2 authentication (if required by mechanism, most do).
+  * NEWUSER - Creates a new user in the password database.
+  * CHANGEPASS - Changes the password of a user.
+  * DELETEUSER - Deletes a user from the password database.
   * QUIT - Logoff.
-  * NEWUSER
-  * CHANGEPASS
-  * DELETEUSER
 
 == Stub commands ==
   * GETPOLICY
