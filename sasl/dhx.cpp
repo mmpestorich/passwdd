@@ -61,6 +61,7 @@ typedef struct server_context {
     Integer	*privateKey, *nonce;
     char	username[129];
     byte	sharedKey[16], outBuffer[2048];
+    byte	decryptiv[8], encryptiv[8];
 } server_context_t;
 
 //
@@ -188,12 +189,10 @@ static int dhx_server_decode(void *conn_context,
     // Decrypt the buffer.
     //
     CAST_KEY	key;
-    byte iv[8];
 
     *output = (const char *)malloc(inputlen);
-    memcpy(iv, "LWallace", 8);
     CAST_set_key(&key, 16, ctx->sharedKey);
-    CAST_cbc_encrypt((const unsigned char *)input, (unsigned char *)*output, inputlen, &key, iv, CAST_DECRYPT);
+    CAST_cbc_encrypt((const unsigned char *)input, (unsigned char *)*output, inputlen, &key, ctx->decryptiv, CAST_DECRYPT);
     *outputlen = inputlen;
 
     return SASL_OK;
@@ -337,6 +336,8 @@ static int dhx_server_mech_step(void *conn_context,
         // Cleanup.
         //
         memset(unencrypted, 0, sizeof(unencrypted));
+	memcpy(ctx->decryptiv, "LWallace", 8);
+	memcpy(ctx->encryptiv, "CJalbert", 8);
 
         //
         // Set oparams. Again, I don't know what all this is, copy and paste!
