@@ -48,6 +48,7 @@ extern int command_changepass(char *, int, char *[], Client *, void *);
 extern int command_user(char *, int, char *[], Client *, void *);
 extern int command_auth(char *, int, char *[], Client *, void *);
 extern int command_auth2(char *, int, char *[], Client *, void *);
+extern int command_getpolicy(char *, int, char *[], Client *, void *);
 
 extern int command_quit(char *, int, char *[], Client *, void *);
 

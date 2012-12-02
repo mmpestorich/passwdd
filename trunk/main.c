@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #include "listener.h"
 #include "pwdb.h"
 #include "ldap.h"
+#include "sasl_auxprop.h"
 
 int doExit = 0;
 
@@ -129,17 +130,20 @@ static struct option longopts[] = {
 	{ "update",	no_argument,		NULL,		'u' },
 	{ "force",	no_argument,		NULL,		'f' },
 	{ "help",	no_argument,		NULL,		'h' },
+	{ "adduser",	required_argument,	NULL,		'n' },
+	{ "deleteuser",	required_argument,	NULL,		'd' },
 	{ NULL,		0,			NULL,		0 }
 };
 
 
 int main(int argc, char *argv[])
 {
-    const char *config_file = "/etc/lpws.conf";
+    const char *config_file = "/etc/lpws.conf", *add_username = NULL,
+		*delete_username = NULL;
     int ch, updateAuth = 0, force = 0;
 
 
-    while ((ch = getopt_long(argc, argv, "c:ufh", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, "c:ufhn:", longopts, NULL)) != -1) {
         switch (ch) {
             case 'c':
                 config_file = optarg;
@@ -151,6 +155,14 @@ int main(int argc, char *argv[])
 
             case 'f':
                 force = 1;
+                break;
+
+            case 'n':
+                add_username = optarg;
+                break;
+
+            case 'd':
+                delete_username = optarg;
                 break;
 
             case 'h':
@@ -213,11 +225,41 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
+    //
+    // Add a user from the command line.
+    //
+    if (add_username != NULL) {
+        char *password;
+
+        password = getpass("New Password: ");
+        if (pwdb_adduser(add_username, password, 0) != 0)
+            printf("Failed to add new user.\r\n");
+	pwdb_close();
+
+        exit(0);
+    }
+
+    //
+    // Delete a user from the command line.
+    //
+    if (delete_username != NULL) {
+        if (pwdb_deleteuser(delete_username) != 0)
+            printf("Failed to delete user.\r\n");
+	pwdb_close();
+
+        exit(0);
+    }
+
     init_client();
 
     if (sasl_server_init(callbacks, "PasswordServer") != SASL_OK) {
         printf("Failed to initialize SASL.\r\n");
 	pwdb_close();
+        exit(1);
+    }
+    if (sasl_auxprop_add_plugin("lpws_internal", lpws_internal_auxprop_init) != SASL_OK) {
+        printf("Failed to load internal SASL plugin.\r\n");
+        pwdb_close();
         exit(1);
     }
 
@@ -260,6 +302,8 @@ static void usage()
     printf("Usage:\r\n");
     printf("\tlpws [-c config]\r\n");
     printf("\tlpws [-c config] -u [-f]\r\n");
+    printf("\tlpws [-c config] --adduser <username>\r\n");
+    printf("\tlpws [-c config] --deleteuser <username>\r\n");
     exit(-1);
 }
 

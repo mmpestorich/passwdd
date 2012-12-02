@@ -31,6 +31,7 @@ DEALINGS IN THE SOFTWARE.
 #include "utils.h"
 #include "keys.h"
 #include "ldap.h"
+#include "pwdb.h"
 
 
 //
@@ -63,6 +64,8 @@ ClientCommand clientCommands[] = {
     { "USER",           command_user },
     { "AUTH",           command_auth },
     { "AUTH2",          command_auth2 },
+
+    { "GETPOLICY",      command_getpolicy },
 
     { "QUIT",           command_quit },
     { NULL,             NULL }
@@ -189,10 +192,10 @@ int command_listreplicas(char *response, int argc, char *argv[], Client *client,
 //
 int command_newuser(char *response, int argc, char *argv[], Client *client, void *context)
 {
-//    const char	*decoded = NULL;
-//    unsigned	decodedLen = 0;
-//    char	encoded[BUFFER_SIZE];
-//    int		encodedLen;
+    const char	*decoded = NULL;
+    unsigned	decodedLen = 0;
+    char	encoded[BUFFER_SIZE * 2];
+    int		encodedLen, ret;
 
 
     //
@@ -204,28 +207,34 @@ int command_newuser(char *response, int argc, char *argv[], Client *client, void
         return (argc - 1);
     }
 
-//    //
-//    // Convert the Base64 encoded value to raw data so we can
-//    // try to decrypt it.
-//    //
-//    if (base64ToBinary(argv[2], encoded, &encodedLen) != SASL_OK) {
-//        buffercatf(response, "-ERR SASL Error\r\n");
-//
-//        return 2;
-//    }
-//
-//    //
-//    // Decode the password.
-//    //
-//    sasl_decode(client->sasl, encoded, encodedLen, &decoded, &decodedLen);
-//    printf("password = %s\r\n", decoded);
-//
-//    //
-//    // Add the response. The return argument is the "slot id", which for us
-//    // right now is just the username.
-//    //
-//    buffercatf(response, "+OK %s\r\n", argv[1]);
-    buffercatf(response, "-ERR Unsupported\r\n");
+    //
+    // Convert the Base64 encoded value to raw data so we can
+    // try to decrypt it.
+    //
+    if (base64ToBinary(argv[2], encoded, &encodedLen) != SASL_OK) {
+        buffercatf(response, "-ERR SASL Error\r\n");
+
+        return 2;
+    }
+
+    //
+    // Decode the password.
+    //
+    sasl_decode(client->sasl, encoded, encodedLen, &decoded, &decodedLen);
+    printf("password = %s\r\n", decoded);
+
+    //
+    // Add this user to the database.
+    //
+    if ((ret = pwdb_adduser(argv[1], decoded, 0)) != 0) {
+        memset((void *)decoded, 0, decodedLen);
+        printf("pwdb_adduser returned %d\r\n", ret);
+        buffercatf(response, "-ERR Failed to add user\r\n");
+    }
+    else {
+        memset((void *)decoded, 0, decodedLen);
+        buffercatf(response, "+OK %s\r\n", argv[1]);
+    }
 
     return 2;
 }
@@ -236,7 +245,19 @@ int command_newuser(char *response, int argc, char *argv[], Client *client, void
 //
 int command_deleteuser(char *response, int argc, char *argv[], Client *client, void *context)
 {
-    buffercatf(response, "+OK\r\n");
+    //
+    // Verify we have the required number of arguments.
+    //
+    if (argc < 2) {
+        buffercatf(response, "-ERR Must specify user to delete\r\n");
+
+        return (argc - 1);
+    }
+
+    if (pwdb_deleteuser(argv[1]) != 0)
+        buffercatf(response, "-ERR Unable to delete user\r\n");
+    else
+        buffercatf(response, "+OK\r\n");
 
     return 1;
 }
@@ -247,7 +268,44 @@ int command_deleteuser(char *response, int argc, char *argv[], Client *client, v
 //
 int command_changepass(char *response, int argc, char *argv[], Client *client, void *context)
 {
-    buffercatf(response, "+OK\r\n");
+    const char	*decoded = NULL;
+    unsigned	decodedLen = 0;
+    char	encoded[BUFFER_SIZE];
+    int		encodedLen;
+
+
+    //
+    // Verify we have the required number of arguments.
+    //
+    if (argc < 3) {
+        buffercatf(response, "-ERR Must specify value\r\n");
+
+        return (argc - 1);
+    }
+
+    //
+    // Convert the Base64 encoded value to raw data so we can
+    // try to decrypt it.
+    //
+    if (base64ToBinary(argv[2], encoded, &encodedLen) != SASL_OK) {
+        buffercatf(response, "-ERR SASL Error\r\n");
+
+        return 2;
+    }
+
+    //
+    // Decode the password.
+    //
+    sasl_decode(client->sasl, encoded, encodedLen, &decoded, &decodedLen);
+
+    //
+    // Update the password database.
+    //
+    if (pwdb_updatepassword(argv[1], decoded) != 0)
+        buffercatf(response, "-ERR Could not update password\r\n");
+    else
+        buffercatf(response, "+OK\r\n");
+    memset((void *)decoded, 0, decodedLen);
 
     return 2;
 }
@@ -500,6 +558,23 @@ int command_quit(char *response, int argc, char *argv[], Client *client, void *c
     buffercatf(response, "+OK password server signing off.\r\n");
 
     return -1;
+}
+
+
+//
+// Client wants to get policy information on a user.
+//
+int command_getpolicy(char *response, int argc, char *argv[], Client *client, void *context)
+{
+    int args = 1;
+
+
+    if (argc >= 3 && strcasecmp(argv[2], "ACTUAL") == 0)
+        args = 2;
+
+    buffercatf(response, "+OK isAdmin=0\r\n");
+
+    return args;
 }
 
 
