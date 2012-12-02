@@ -124,14 +124,14 @@ int pwdb_adduser(const char *username, const char *password, uint32_t flags)
 
 
     if (strlen(username) > USERNAME_MAX || strlen(password) > PASSWORD_MAX)
-	return -1;
+	return -EINVAL;
 
     //
     // Initialize the new record.
     //
     record = (aPasswordRec *)malloc(RECORD_SIZE);
     if (record == NULL)
-	return -1;
+	return -ENOMEM;
 
     //
     // Populate initial data.
@@ -149,8 +149,12 @@ int pwdb_adduser(const char *username, const char *password, uint32_t flags)
     ret = pwdb_write(username, record, 0);
     memset(record, 0, RECORD_SIZE);
     free(record);
-    if (ret != 0)
-	return -1;
+    if (ret != 0) {
+        if (ret == DB_KEYEXIST)
+            return -EEXIST;
+
+	return -EFAULT;
+    }
 
     return 0;
 }
@@ -198,7 +202,7 @@ int pwdb_updatepassword(const char *username, const char *password)
     memset(record, 0, RECORD_SIZE);
     free(record);
     if (ret != 0)
-	return -EAGAIN;
+	return -EFAULT;
 
     return 0;
 }
@@ -244,7 +248,7 @@ int pwdb_updateflags(const char *username, uint32_t flags)
     memset(record, 0, RECORD_SIZE);
     free(record);
     if (ret != 0)
-	return -EAGAIN;
+	return -EFAULT;
 
     return 0;
 }
@@ -283,8 +287,12 @@ int pwdb_deleteuser(const char *username)
     key.size = strlen(username) + 1;
 
     ret = dbp->del(dbp, NULL, &key, 0);
-
-    return (ret == 0 ? 0 : -EAGAIN);
+    if (ret == 0)
+        return 0;
+    else if (ret == DB_NOTFOUND)
+        return -ENOENT;
+    else
+        return -EFAULT;
 }
 
 
