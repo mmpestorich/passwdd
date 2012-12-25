@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 extern const char *myHostname, *myAddress;
 
 void buffercatf(char *buffer, const char *format, ...);
+extern size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...);
 
 
 void binaryToHex(const unsigned char *data, int len, char *hexStr);

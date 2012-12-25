@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -ggdb -Wall -O
 LDFLAGS = -lcrypto -lsasl2 -lldap -ldb
 SRCS = main.c commands.c utils.c keys.c client.c config.c ldap.c
-SRCS += listener.c pwdb.c sasl_auxprop.c
+SRCS += listener.c pwdb.c sasl_auxprop.c policy.c
 OBJS = $(SRCS:.c=.o)
 prefix ?= /usr/local
 
