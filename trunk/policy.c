@@ -90,6 +90,8 @@ aPasswordPolicy	*policy_new(const char *policy_string)
     //
     policy = (aPasswordPolicy *)malloc(sizeof(aPasswordPolicy));
     memset(policy, 0, sizeof(aPasswordPolicy));
+    policy->expirationDateGMT = UINT64_MAX;
+    policy->hardExpireDateGMT = UINT64_MAX;
 
     //
     // If they passed in a policy string, parse it.
