@@ -47,6 +47,24 @@ void buffercatf(char *buffer, const char *format, ...)
 
 
 //
+// A merged implementation of snprintf and strncat.
+//
+size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...)
+{
+    size_t result;
+    va_list args;
+    size_t len = strnlen(buf, bufSize);
+
+    va_start(args, fmt);
+    result = vsnprintf(buf + len, bufSize - len - 1, fmt, args);
+    va_end(args);
+    buf[len + result] = '\0';
+
+    return result + len;
+}
+
+
+//
 // Convert the given raw binary data into a hex-string format. The hex
 // string buffer must have enough room for the stored data.
 //

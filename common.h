@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 
 #define LISTENER_MAX    32
 #define CLIENT_MAX      64
+#define POLICY_MAX      2048
 #define BUFFER_SIZE     1024
 #define ARGS_MAX        32
 #define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" \"DHX\" \"APOP\" )"
