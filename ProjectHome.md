@@ -1,0 +1,1 @@
+This project provides an open source implementation of Apple's PasswordServer. When tied with a properly configured OpenLDAP it will allow various Mac services (such as iChat, iCal, AddressBook, etc.) to do full SASL authentication via the PasswordServer service.
