@@ -20,12 +20,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __CONF_H__
+#define __CONF_H__
 
-int init_config(const char *config_file);
-void free_config();
-const char *find_config(const char *option);
+int conf_init(const char *conf_file);
+void conf_free();
+const char *conf_find(const char *option);
 
-#endif /* __CONFIG_H__ */
+#endif /* __CONF_H__ */
 

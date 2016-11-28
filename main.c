@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 #include "common.h"
 #include "client.h"
 #include "keys.h"
-#include "config.h"
+#include "conf.h"
 #include "listener.h"
 #include "pwdb.h"
 #include "ldap.h"
@@ -80,7 +80,7 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
     //
     // Get the value for this option.
     //
-    value = find_config(option_name);
+    value = conf_find(option_name);
     if (value != NULL) {
         *result = value;
 
@@ -93,7 +93,7 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
     //
     if (plugin_name != NULL && strcasecmp(plugin_name, "lpws_ldap") == 0) {
         snprintf(option_name, sizeof(option_name) - 1, "ldap_%s", option);
-        value = find_config(option_name);
+        value = conf_find(option_name);
         if (value != NULL) {
             *result = value;
 
@@ -138,7 +138,7 @@ static struct option longopts[] = {
 
 int main(int argc, char *argv[])
 {
-    const char *config_file = "/etc/lpws.conf", *add_username = NULL,
+    const char *config_file = "/etc/passwdd.conf", *add_username = NULL,
 		*delete_username = NULL;
     int ch, updateAuth = 0, force = 0;
 
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (init_config(config_file) == -1)
+    if (conf_init(config_file) == -1)
         exit(1);
 
     //
@@ -179,8 +179,8 @@ int main(int argc, char *argv[])
     //
     char *name, *address;
 
-    if (find_config("hostname") != NULL) {
-        name = strdup(find_config("hostname"));
+    if (conf_find("hostname") != NULL) {
+        name = strdup(conf_find("hostname"));
     }
     else {
         name = malloc(256);
@@ -189,8 +189,8 @@ int main(int argc, char *argv[])
     }
     myHostname = name;
 
-    if (find_config("ipaddress") != NULL) {
-        address = strdup(find_config("ipaddress"));
+    if (conf_find("ipaddress") != NULL) {
+        address = strdup(conf_find("ipaddress"));
     }
     else {
         struct hostent *ent = gethostbyname(myHostname);
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
     if (loadKeys() == -1)
         exit(1);
     if (pwdb_open() != 0)
-	exit(1);
+	    exit(1);
 
     //
     // Make sure all the user records have a authAuthority record for us.
@@ -252,9 +252,9 @@ int main(int argc, char *argv[])
 
     init_client();
 
-    if (sasl_server_init(callbacks, "PasswordServer") != SASL_OK) {
+    if (sasl_server_init(callbacks, "passwdd") != SASL_OK) {
         printf("Failed to initialize SASL.\r\n");
-	pwdb_close();
+	    pwdb_close();
         exit(1);
     }
     if (sasl_auxprop_add_plugin("lpws_internal", lpws_internal_auxprop_init) != SASL_OK) {
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 
     if (setupListeners() == -1) {
         printf("Failed to setup server sockets.\r\n");
-	pwdb_close();
+	    pwdb_close();
         exit(1);
     }
 
@@ -300,10 +300,10 @@ int main(int argc, char *argv[])
 static void usage()
 {
     printf("Usage:\r\n");
-    printf("\tlpws [-c config]\r\n");
-    printf("\tlpws [-c config] -u [-f]\r\n");
-    printf("\tlpws [-c config] --adduser <username>\r\n");
-    printf("\tlpws [-c config] --deleteuser <username>\r\n");
+    printf("\tpasswdd [-c config]\r\n");
+    printf("\tpasswdd [-c config] -u [-f]\r\n");
+    printf("\tpasswdd [-c config] --adduser <username>\r\n");
+    printf("\tpasswdd [-c config] --deleteuser <username>\r\n");
     exit(-1);
 }
 

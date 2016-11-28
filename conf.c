@@ -24,25 +24,25 @@ DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include "common.h"
-#include "config.h"
+#include "conf.h"
 
 
 typedef struct {
     char *key;
     char *value;
-} config_option;
+} conf_option;
 
 
 #define CONFIG_MAX	100
-static config_option options[CONFIG_MAX];
+static conf_option options[CONFIG_MAX];
 
-static int add_config(const char *key, const char *value);
+static int conf_add(const char *key, const char *value);
 
 
 //
 // Initialize the config system by reading the config file.
 //
-int init_config(const char *config_file)
+int conf_init(const char *conf_file)
 {
     FILE *fp;
     char line[BUFFER_SIZE], *s, *key, *value;
@@ -51,7 +51,7 @@ int init_config(const char *config_file)
 
     memset(&options, 0, sizeof(options));
 
-    fp = fopen(config_file, "r");
+    fp = fopen(conf_file, "r");
     if (fp == NULL) {
         printf("Config file not found.\r\n");
 
@@ -98,7 +98,7 @@ int init_config(const char *config_file)
         //
         // Save the config option.
         //
-        add_config(key, value);
+      conf_add(key, value);
     }
     fclose(fp);
 
@@ -109,7 +109,7 @@ int init_config(const char *config_file)
 //
 // Free all memory used by the config system.
 //
-void free_config()
+void conf_free()
 {
     int i;
 
@@ -131,7 +131,7 @@ void free_config()
 // Add a new value to the config system. Returns 0 on success or -1 on
 // failue.
 //
-static int add_config(const char *key, const char *value)
+static int conf_add(const char *key, const char *value)
 {
     int i;
 
@@ -153,7 +153,7 @@ static int add_config(const char *key, const char *value)
 // Find the value of the given option. Returns NULL if no option has been
 // defined.
 //
-const char *find_config(const char *option)
+const char *conf_find(const char *option)
 {
     int i;
 

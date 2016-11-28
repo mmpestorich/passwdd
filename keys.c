@@ -25,7 +25,7 @@ DEALINGS IN THE SOFTWARE.
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include "keys.h"
-#include "config.h"
+#include "conf.h"
 #include "utils.h"
 
 
@@ -46,11 +46,11 @@ int loadKeys()
 
     //
     // Allow the user to override the private key location, otherwise use
-    // the standard of /etc/lpws.key.
+    // the standard of /etc/passwdd.key.
     //
-    keyfile = find_config("private_key");
+    keyfile = conf_find("private_key");
     if (keyfile == NULL)
-        keyfile = "/etc/lpws.key";
+        keyfile = "/etc/passwdd.key";
 
     //
     // Try to open the key file.

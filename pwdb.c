@@ -25,9 +25,9 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <db.h>
+#include <db60/db.h>
 #include "pwdb.h"
-#include "config.h"
+#include "conf.h"
 #include "utils.h"
 #include "common.h"
 
@@ -75,7 +75,7 @@ int	pwdb_open()
     //
     // Get the name of the database from the config file.
     //
-    database = find_config("database");
+    database = conf_find("database");
     if (database == NULL) {
 	fprintf(stderr, "Database not defined in configuration.\r\n");
 	return -1;

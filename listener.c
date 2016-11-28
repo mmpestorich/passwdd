@@ -30,7 +30,7 @@ DEALINGS IN THE SOFTWARE.
 #include "common.h"
 #include "listener.h"
 #include "client.h"
-#include "config.h"
+#include "conf.h"
 
 
 typedef struct {
@@ -45,7 +45,7 @@ static Listener listeners[LISTENER_MAX];
 //
 // Create a listener socket on the specified port.
 //
-static int createListener(int isTcp, int port)
+static int createUdpListener(int port)
 {
     struct sockaddr_in addr;
     int fd;
@@ -54,16 +54,10 @@ static int createListener(int isTcp, int port)
     //
     // Create the socket.
     //
-    fd = socket(AF_INET, (isTcp ? SOCK_STREAM : SOCK_DGRAM), 0);
-    if (fd == -1)
+    fd = socket(PF_INET, SOCK_DGRAM, 0);
+    if (fd == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
         return -1;
-
-    //
-    // If this is a TCP socket mark that we can re-use the address.
-    //
-    if (isTcp) {
-        int optval = 1;
-        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     }
 
     //
@@ -73,7 +67,8 @@ static int createListener(int isTcp, int port)
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(port);
-    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
         close(fd);
         return -1;
     }
@@ -86,10 +81,58 @@ static int createListener(int isTcp, int port)
         return -1;
     }
 
+    return fd;
+}
+
+//
+// Create a listener socket on the specified port.
+//
+static int createTcpListener(int port) {
+    struct sockaddr_in addr;
+    int fd;
+
+    //
+    // Create the socket.
+    //
+    fd = socket(PF_INET, SOCK_STREAM, 0);
+    if (fd == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
+        return -1;
+    }
+
+    //
+    // Mark the TCP socket so that we can re-use the address.
+    //
+    int optval = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
+    //
+    // Bind the socket to 0.0.0.0:port.
+    //
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(port);
+    if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
+
+    //
+    // Mark for non-blocking I/O.
+    //
+    if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK) == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
+
     //
     // If TCP socket, start listening for connects.
     //
-    if (isTcp && listen(fd, 5) == -1) {
+    if (listen(fd, 5) == -1) {
+        fprintf(stderr, "Error: %s", strerror(errno));
         close(fd);
         return -1;
     }
@@ -116,7 +159,7 @@ void closeListeners()
 
 
 //
-// Setup all the configured listner sockets.
+// Setup all the configured listener sockets.
 //
 int setupListeners()
 {
@@ -132,7 +175,7 @@ int setupListeners()
     //
     // UDP Listener on 0.0.0.0:3659.
     //
-    listeners[l].fd = createListener(0, 3659);
+    listeners[l].fd = createUdpListener(3659);
     if (listeners[l].fd == -1)
         return -1;
     listeners[l++].isTcp = 0;
@@ -140,7 +183,7 @@ int setupListeners()
     //
     // TCP Listener on 0.0.0.0:106.
     //
-    listeners[l].fd = createListener(1, 106);
+    listeners[l].fd = createTcpListener(106);
     if (listeners[l].fd == -1) {
         closeListeners();
 
@@ -148,7 +191,7 @@ int setupListeners()
     }
     listeners[l++].isTcp = 1;
 
-    listeners[l].fd = createListener(1, 3659);
+    listeners[l].fd = createTcpListener(3659);
     if (listeners[l].fd == -1) {
         closeListeners();
 
@@ -211,7 +254,7 @@ static int processTcpListener(int fd)
     // Save the child to the next available client.
     //
     if (add_client(child, NULL) != NULL) {
-        msg = "+OK LinuxPasswordServer 1.0 password server at 127.0.0.1 ready.\r\n";
+        msg = "+OK passwdd 1.0 at 127.0.0.1 ready.\r\n";
         write(child, msg, strlen(msg));
 
         return 0;
@@ -229,7 +272,7 @@ static int processTcpListener(int fd)
 
 //
 // Poll all sockets for activity and process anything that is found.
-//
+// TODO MMP Replace with kqueue
 int poll_sockets()
 {
     struct timeval timeout = { 1, 0 };
@@ -264,8 +307,8 @@ int poll_sockets()
     // Wait for activity.
     //
     if (select(maxfd + 1, &read_fds, NULL, NULL, &timeout) == -1) {
-	if (errno == EINTR)
-	    return 0;
+        if (errno == EINTR)
+            return 0;
 
         printf("errno = %d\r\n", errno);
         return -1;

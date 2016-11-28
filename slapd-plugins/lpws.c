@@ -39,8 +39,9 @@ static int chk_lpws(
 
 int init_module(int argc, char *argv[])
 {
-    lutil_passwd_add((struct berval *)&scheme_blacklist, chk_blacklist, NULL);
-    lutil_passwd_add((struct berval *)&scheme_lpws, chk_lpws, NULL);
+	//TODO MMP Missing implementations... where are they?
+    //lutil_passwd_add((struct berval *)&scheme_blacklist, chk_blacklist, NULL);
+    //lutil_passwd_add((struct berval *)&scheme_lpws, chk_lpws, NULL);
 
     return 0;
 }

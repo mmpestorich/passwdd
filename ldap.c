@@ -27,7 +27,7 @@ DEALINGS IN THE SOFTWARE.
 #include <lber.h>
 #include "ldap.h"
 #include "keys.h"
-#include "config.h"
+#include "conf.h"
 #include "utils.h"
 #include "common.h"
 
@@ -50,7 +50,7 @@ LDAP *ldap_connect(int bind)
     //
     // Get the config options we need to connect to the LDAP server.
     //
-    uri = find_config("ldap_uri");
+    uri = conf_find("ldap_uri");
     if (uri == NULL)
         return NULL;
 
@@ -58,8 +58,8 @@ LDAP *ldap_connect(int bind)
     // Get the config options we need to bind to the LDAP server.
     //
     if (bind) {
-        binddn = find_config("ldap_binddn");
-        bindpw = find_config("ldap_bindpw");
+        binddn = conf_find("ldap_binddn");
+        bindpw = conf_find("ldap_bindpw");
         if (binddn == NULL || bindpw == NULL)
             return NULL;
     }
@@ -136,7 +136,7 @@ char *ldap_replicalist()
     //
     // Get the config options we need to search the LDAP server.
     //
-    basedn = find_config("ldap_basedn");
+    basedn = conf_find("ldap_basedn");
     if (basedn == NULL)
         return NULL;
 
@@ -225,7 +225,7 @@ int ldap_updateAuthority(int force)
     //
     // Get the config options we need to search the LDAP server.
     //
-    basedn = find_config("ldap_basedn");
+    basedn = conf_find("ldap_basedn");
     if (basedn == NULL) {
 #ifdef DEBUG
         printf("No search base configured.\r\n");

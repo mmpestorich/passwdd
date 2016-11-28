@@ -23,11 +23,13 @@ DEALINGS IN THE SOFTWARE.
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
 #include <stdlib.h>
 #include "policy.h"
 #include "common.h"
-#include "config.h"
+#include "conf.h"
 #include "utils.h"
 
 
