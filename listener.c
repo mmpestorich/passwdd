@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,36 +20,34 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <fcntl.h>
-#include <errno.h>
-#include "common.h"
 #include "listener.h"
 #include "client.h"
+#include "common.h"
 #include "conf.h"
-
+#include <err.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/event.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 typedef struct {
     int fd;
     int isTcp;
 } Listener;
 
-
 static Listener listeners[LISTENER_MAX];
-
 
 //
 // Create a listener socket on the specified port.
 //
-static int createUdpListener(int port)
-{
+static int listener_create_udp(int port) {
     struct sockaddr_in addr;
     int fd;
-
 
     //
     // Create the socket.
@@ -67,7 +65,7 @@ static int createUdpListener(int port)
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(port);
-    if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
+    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
         fprintf(stderr, "Error: %s", strerror(errno));
         close(fd);
         return -1;
@@ -87,7 +85,7 @@ static int createUdpListener(int port)
 //
 // Create a listener socket on the specified port.
 //
-static int createTcpListener(int port) {
+static int listener_create_tcp(int port) {
     struct sockaddr_in addr;
     int fd;
 
@@ -113,8 +111,8 @@ static int createTcpListener(int port) {
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(port);
-    if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
-        fprintf(stderr, "Error: %s", strerror(errno));
+    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        fprintf(stderr, "Error: %s\n", strerror(errno));
         close(fd);
         return -1;
     }
@@ -123,7 +121,7 @@ static int createTcpListener(int port) {
     // Mark for non-blocking I/O.
     //
     if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK) == -1) {
-        fprintf(stderr, "Error: %s", strerror(errno));
+        fprintf(stderr, "Error: %s\n", strerror(errno));
         close(fd);
         return -1;
     }
@@ -132,7 +130,7 @@ static int createTcpListener(int port) {
     // If TCP socket, start listening for connects.
     //
     if (listen(fd, 5) == -1) {
-        fprintf(stderr, "Error: %s", strerror(errno));
+        fprintf(stderr, "Error: %s\n", strerror(errno));
         close(fd);
         return -1;
     }
@@ -140,14 +138,11 @@ static int createTcpListener(int port) {
     return fd;
 }
 
-
 //
 // Close all open listeners.
 //
-void closeListeners()
-{
+void listeners_close() {
     int i;
-
 
     for (i = 0; i < LISTENER_MAX; i++) {
         if (listeners[i].fd != -1) {
@@ -157,14 +152,11 @@ void closeListeners()
     }
 }
 
-
 //
 // Setup all the configured listener sockets.
 //
-int setupListeners()
-{
+int listeners_setup() {
     int i, l = 0;
-
 
     //
     // Mark empty all the listeners.
@@ -175,7 +167,7 @@ int setupListeners()
     //
     // UDP Listener on 0.0.0.0:3659.
     //
-    listeners[l].fd = createUdpListener(3659);
+    listeners[l].fd = listener_create_udp(3659);
     if (listeners[l].fd == -1)
         return -1;
     listeners[l++].isTcp = 0;
@@ -183,17 +175,17 @@ int setupListeners()
     //
     // TCP Listener on 0.0.0.0:106.
     //
-    listeners[l].fd = createTcpListener(106);
+    listeners[l].fd = listener_create_tcp(106);
     if (listeners[l].fd == -1) {
-        closeListeners();
+        listeners_close();
 
         return -1;
     }
     listeners[l++].isTcp = 1;
 
-    listeners[l].fd = createTcpListener(3659);
+    listeners[l].fd = listener_create_tcp(3659);
     if (listeners[l].fd == -1) {
-        closeListeners();
+        listeners_close();
 
         return -1;
     }
@@ -202,38 +194,31 @@ int setupListeners()
     return 0;
 }
 
-
 //
 // Process data from a UDP listener. This is usually a request from a client
 // to "ping" us to see if we are available.
 //
-static int processUdpListener(int fd)
-{
+static int listener_handle_udp(int fd) {
     struct sockaddr_in addr;
     socklen_t addrlen;
     char buffer[BUFFER_SIZE];
-    int len;
 
-
-    len = recvfrom(fd, buffer, sizeof(buffer) - 1, 0, (struct sockaddr *)&addr, &addrlen);
-    len = len; /* clear warning for now */
-    printf("Ignoring UDP message.\r\n");
+    recvfrom(fd, buffer, sizeof(buffer) - 1, 0, (struct sockaddr *)&addr,
+             &addrlen);
+    printf("Not implemented. Ignoring UDP message.\r\n");
 
     return -1;
 }
-
 
 //
 // Process activity on a TCP listener, this means accept a new client
 // connection.
 //
-static int processTcpListener(int fd)
-{
+static int listener_handle_tcp(int fd) {
     struct sockaddr_in addr;
     socklen_t addrlen;
     int child;
     const char *msg;
-
 
     //
     // Accept the new client.
@@ -253,7 +238,7 @@ static int processTcpListener(int fd)
     //
     // Save the child to the next available client.
     //
-    if (add_client(child, NULL) != NULL) {
+    if (client_add(child, NULL) != NULL) {
         msg = "+OK passwdd 1.0 at 127.0.0.1 ready.\r\n";
         write(child, msg, strlen(msg));
 
@@ -269,16 +254,12 @@ static int processTcpListener(int fd)
     return -1;
 }
 
-
 //
 // Poll all sockets for activity and process anything that is found.
-// TODO MMP Replace with kqueue
-int poll_sockets()
-{
-    struct timeval timeout = { 1, 0 };
+int listeners_poll() {
+    struct timeval timeout = {1, 0};
     fd_set read_fds;
     int i, maxfd = -1, fd;
-
 
     //
     // Zero out the select structs.
@@ -299,7 +280,7 @@ int poll_sockets()
     //
     // Add in the client sockets.
     //
-    fd = setup_clients_fdset(&read_fds);
+    fd = clients_setup_fdset(&read_fds);
     if (fd > maxfd)
         maxfd = fd;
 
@@ -321,9 +302,9 @@ int poll_sockets()
         if (listeners[i].fd != -1) {
             if (FD_ISSET(listeners[i].fd, &read_fds)) {
                 if (listeners[i].isTcp == 0)
-                    processUdpListener(listeners[i].fd);
+                    listener_handle_udp(listeners[i].fd);
                 else
-                    processTcpListener(listeners[i].fd);
+                    listener_handle_tcp(listeners[i].fd);
             }
         }
     }
@@ -331,9 +312,49 @@ int poll_sockets()
     //
     // Look for activity on the client sockets.
     //
-    process_clients(&read_fds);
+    clients_process_message(&read_fds);
 
     return 0;
 }
 
+/*
+ KQUEUE
+*/
+int listeners_kqueue() {
+    int kq, n;
 
+    // Create kqueue
+    kq = kqueue();
+    if (kq == -1) {
+        err(EXIT_FAILURE, "kqueue() failed");
+    }
+
+    n = sizeof(listeners) / sizeof(listeners[0]);
+    struct kevent events[n];
+
+    // Initialize kevents to monitor
+    // FIX MMP listener count (do we even need Listener strcut)
+    for (int i = 0; i < n; i++) {
+        if (listeners[i].fd != -1) {
+            EV_SET(&events[i], listeners[i].fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+        }
+    }
+
+    // Register monitored kevents with the kqueue
+    if (kevent(kq, events, n, NULL, 0, NULL) == -1) {
+        err(EXIT_FAILURE, "kevent register");
+    }
+    for (int i = 0; i < n; i++) {
+        struct kevent event = events[i];
+        if (event.flags & EV_ERROR) {
+            errx(EXIT_FAILURE, "Event error: %s", strerror((int)&event.data));
+        }
+    }
+
+    for (;;) {
+        // Sleep until an event is triggered
+        if (kevent(kq, NULL, 0, events, n, NULL) == -1) {
+            err(EXIT_FAILURE, "kevent wait");
+        }
+    }
+}

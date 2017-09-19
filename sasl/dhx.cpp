@@ -24,11 +24,11 @@ DEALINGS IN THE SOFTWARE.
  extern "C" {
 #endif
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h> 
-#include <sasl.h>
-#include <saslplug.h>
+#include <sasl/sasl.h>
+#include <sasl/saslplug.h>
 
 #include "plugin_common.h"
 

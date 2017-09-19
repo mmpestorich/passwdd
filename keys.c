@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,29 +20,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
 #include "keys.h"
 #include "conf.h"
 #include "utils.h"
-
+#include <openssl/pem.h>
+#include <openssl/rsa.h>
+#include <stdio.h>
+#include <string.h>
 
 RSA *privateKey = NULL;
 const char *publicKeyThumbprint = NULL;
 
-
 //
 // Load all necessary keys, right now this is just the privateKey.
 //
-int loadKeys()
-{
-    const char	*keyfile;
-    FILE	*fp;
-    char	*e, *m;
-    int		len;
-
+int loadKeys() {
+    const char *keyfile;
+    FILE *fp;
+    char *e, *m;
+    int len;
 
     //
     // Allow the user to override the private key location, otherwise use
@@ -81,7 +77,9 @@ int loadKeys()
     e = BN_bn2dec(privateKey->e);
     m = BN_bn2dec(privateKey->n);
     if (BN_num_bits(privateKey->n) > 8192) {
-        fprintf(stderr, "Your private key is larger than 8,192 bits. Think about it.\r\n");
+        fprintf(
+            stderr,
+            "Your private key is larger than 8,192 bits. Think about it.\r\n");
         return -1;
     }
 
@@ -100,4 +98,4 @@ int loadKeys()
     OPENSSL_free(e);
 
     return 0;
-}           
+}

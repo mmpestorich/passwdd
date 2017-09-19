@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,22 +20,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include "client.h"
+#include "common.h"
+#include "conf.h"
+#include "keys.h"
+#include "ldap.h"
+#include "listener.h"
+#include "pwdb.h"
+#include "sasl_auxprop.h"
+#include <arpa/inet.h>
+#include <getopt.h>
+#include <netdb.h>
+#include <sasl/sasl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
-#include <sasl/sasl.h>
-#include <signal.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include "common.h"
-#include "client.h"
-#include "keys.h"
-#include "conf.h"
-#include "listener.h"
-#include "pwdb.h"
-#include "ldap.h"
-#include "sasl_auxprop.h"
 
 int doExit = 0;
 
@@ -44,31 +44,28 @@ const char *myAddress = NULL;
 
 static void usage();
 
-
 //
 // Catch signals that we should exit for.
 //
-void terminate(int signum)
-{
+void terminate(int signum) {
     fprintf(stderr, "Got signal %d, exiting...\r\n", signum);
     doExit = 1;
 }
 
-
 //
 // Retrieve an SASL option.
 //
-static int getopt_func(void *context, const char *plugin_name, const char *option, const char **result, unsigned *len)
-{
+static int getopt_func(void *context, const char *plugin_name,
+                       const char *option, const char **result, unsigned *len) {
     const char *value;
     char option_name[256];
-
 
     //
     // Construct a more helpful option name.
     //
     if (plugin_name != NULL)
-        snprintf(option_name, sizeof(option_name) - 1, "sasl_%s_%s", plugin_name, option);
+        snprintf(option_name, sizeof(option_name) - 1, "sasl_%s_%s",
+                 plugin_name, option);
     else
         snprintf(option_name, sizeof(option_name) - 1, "sasl_%s", option);
     option_name[sizeof(option_name) - 1] = '\0';
@@ -104,12 +101,10 @@ static int getopt_func(void *context, const char *plugin_name, const char *optio
     return SASL_FAIL;
 }
 
-
 //
 // Log a message from the SASL system.
 //
-static int log_func(void *context, int level, const char *message)
-{
+static int log_func(void *context, int level, const char *message) {
 #ifdef DEBUG
     printf("CyrusLog: %s\r\n", message);
 #endif
@@ -117,57 +112,50 @@ static int log_func(void *context, int level, const char *message)
     return SASL_OK;
 }
 
-
 static sasl_callback_t callbacks[] = {
-    { SASL_CB_GETOPT, (int (*)())&getopt_func, NULL },
-    { SASL_CB_LOG, (int (*)())&log_func, NULL },
-    { SASL_CB_LIST_END, NULL, NULL }
-};
+    {SASL_CB_GETOPT, (int (*)()) & getopt_func, NULL},
+    {SASL_CB_LOG, (int (*)()) & log_func, NULL},
+    {SASL_CB_LIST_END, NULL, NULL}};
 
+static struct option longopts[] = {{"config", required_argument, NULL, 'c'},
+                                   {"update", no_argument, NULL, 'u'},
+                                   {"force", no_argument, NULL, 'f'},
+                                   {"help", no_argument, NULL, 'h'},
+                                   {"adduser", required_argument, NULL, 'n'},
+                                   {"deleteuser", required_argument, NULL, 'd'},
+                                   {NULL, 0, NULL, 0}};
 
-static struct option longopts[] = {
-	{ "config",	required_argument,	NULL,		'c' },
-	{ "update",	no_argument,		NULL,		'u' },
-	{ "force",	no_argument,		NULL,		'f' },
-	{ "help",	no_argument,		NULL,		'h' },
-	{ "adduser",	required_argument,	NULL,		'n' },
-	{ "deleteuser",	required_argument,	NULL,		'd' },
-	{ NULL,		0,			NULL,		0 }
-};
-
-
-int main(int argc, char *argv[])
-{
-    const char *config_file = "/etc/passwdd.conf", *add_username = NULL,
-		*delete_username = NULL;
+int main(int argc, char *argv[]) {
+    const char *config_file = "/etc/passwdd.conf";
+    const char *add_username = NULL;
+    const char *delete_username = NULL;
     int ch, updateAuth = 0, force = 0;
-
 
     while ((ch = getopt_long(argc, argv, "c:ufhn:", longopts, NULL)) != -1) {
         switch (ch) {
-            case 'c':
-                config_file = optarg;
-                break;
+        case 'c':
+            config_file = optarg;
+            break;
 
-            case 'u':
-                updateAuth = 1;
-                break;
+        case 'u':
+            updateAuth = 1;
+            break;
 
-            case 'f':
-                force = 1;
-                break;
+        case 'f':
+            force = 1;
+            break;
 
-            case 'n':
-                add_username = optarg;
-                break;
+        case 'n':
+            add_username = optarg;
+            break;
 
-            case 'd':
-                delete_username = optarg;
-                break;
+        case 'd':
+            delete_username = optarg;
+            break;
 
-            case 'h':
-            default:
-                usage();
+        case 'h':
+        default:
+            usage();
         }
     }
 
@@ -181,8 +169,7 @@ int main(int argc, char *argv[])
 
     if (conf_find("hostname") != NULL) {
         name = strdup(conf_find("hostname"));
-    }
-    else {
+    } else {
         name = malloc(256);
         if (gethostname(name, 256) != 0)
             exit(1);
@@ -191,8 +178,7 @@ int main(int argc, char *argv[])
 
     if (conf_find("ipaddress") != NULL) {
         address = strdup(conf_find("ipaddress"));
-    }
-    else {
+    } else {
         struct hostent *ent = gethostbyname(myHostname);
         if (ent == NULL)
             exit(1);
@@ -214,64 +200,69 @@ int main(int argc, char *argv[])
     if (loadKeys() == -1)
         exit(1);
     if (pwdb_open() != 0)
-	    exit(1);
+        exit(1);
 
     //
     // Make sure all the user records have a authAuthority record for us.
     //
-    if (updateAuth == 1) {
-        ldap_updateAuthority(force);
-	pwdb_close();
-        exit(0);
-    }
+    //if (updateAuth == 1) {
+    //    ldap_updateAuthority(force);
+    //    pwdb_close();
+    //    exit(0);
+    //}
 
     //
     // Add a user from the command line.
     //
-    if (add_username != NULL) {
-        char *password;
-
-        password = getpass("New Password: ");
-        if (pwdb_adduser(add_username, password, 0) != 0)
-            printf("Failed to add new user.\r\n");
-	pwdb_close();
-
-        exit(0);
-    }
+    //if (add_username != NULL) {
+    //    char *password;
+    //
+    //    password = getpass("New Password: ");
+    //    if (pwdb_adduser(add_username, password, 0) != 0)
+    //        printf("Failed to add new user.\r\n");
+    //    pwdb_close();
+    //
+    //    exit(0);
+    //}
 
     //
     // Delete a user from the command line.
     //
-    if (delete_username != NULL) {
-        if (pwdb_deleteuser(delete_username) != 0)
-            printf("Failed to delete user.\r\n");
-	pwdb_close();
+    //if (delete_username != NULL) {
+    //    if (pwdb_deleteuser(delete_username) != 0)
+    //        printf("Failed to delete user.\r\n");
+    //    pwdb_close();
+    //
+    //    exit(0);
+    //}
 
-        exit(0);
-    }
-
-    init_client();
+    client_init();
 
     if (sasl_server_init(callbacks, "passwdd") != SASL_OK) {
         printf("Failed to initialize SASL.\r\n");
-	    pwdb_close();
+        pwdb_close();
         exit(1);
     }
+
     if (sasl_auxprop_add_plugin("lpws_internal", lpws_internal_auxprop_init) != SASL_OK) {
         printf("Failed to load internal SASL plugin.\r\n");
         pwdb_close();
         exit(1);
     }
 
-    if (setupListeners() == -1) {
+    if (listeners_setup() == -1) {
         printf("Failed to setup server sockets.\r\n");
-	    pwdb_close();
+        pwdb_close();
         exit(1);
     }
 
     while (!doExit) {
-        if (poll_sockets() == -1) {
-            printf("Something very bad happened polling for activity. Aborting.\r\n");
+        //if (listeners_poll() == -1) {
+        //    printf("Something very bad happened polling for activity. Aborting.\r\n");
+        //    exit(2);
+        //}
+        if (listeners_kqueue() != 0) {
+            printf("Something very bad happened while processing activity. Aborting.\r\n");
             exit(2);
         }
     }
@@ -283,22 +274,20 @@ int main(int argc, char *argv[])
     //
     // Close all server sockets.
     //
-    closeListeners();
+    listeners_close();
 
     //
     // Close database.
     //
     pwdb_close();
-    
+
     return 0;
 }
-
 
 //
 // Display some simple usage information to the user.
 //
-static void usage()
-{
+static void usage() {
     printf("Usage:\r\n");
     printf("\tpasswdd [-c config]\r\n");
     printf("\tpasswdd [-c config] -u [-f]\r\n");
@@ -306,4 +295,3 @@ static void usage()
     printf("\tpasswdd [-c config] --deleteuser <username>\r\n");
     exit(-1);
 }
-

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,20 +23,20 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __PWDB_H__
 #define __PWDB_H__
 
-#include <stdio.h>
 #include <stdint.h>
-
+#include <stdio.h>
 
 typedef struct PasswordRec aPasswordRec;
 
-extern int  pwdb_open();
+extern int pwdb_open();
 extern void pwdb_close();
 
-extern int  pwdb_adduser(const char *username, const char *password, uint32_t flags);
-extern int  pwdb_updatepassword(const char *username, const char *password);
-extern int  pwdb_updateflags(const char *username, uint32_t flags);
-extern int  pwdb_deleteuser(const char *username);
-extern int  pwdb_getpassword(const char *username, char *password, int password_size);
+extern int pwdb_adduser(const char *username, const char *password,
+                        uint32_t flags);
+extern int pwdb_updatepassword(const char *username, const char *password);
+extern int pwdb_updateflags(const char *username, uint32_t flags);
+extern int pwdb_deleteuser(const char *username);
+extern int pwdb_getpassword(const char *username, char *password,
+                            int password_size);
 
 #endif /* __PWDB_H__ */
-

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,37 +20,47 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include "conf.h"
+#include "common.h"
+#include <sys/param.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "common.h"
-#include "conf.h"
-
+#include <unistd.h>
 
 typedef struct {
     char *key;
     char *value;
 } conf_option;
 
-
-#define CONFIG_MAX	100
+#define CONFIG_MAX 100
 static conf_option options[CONFIG_MAX];
 
 static int conf_add(const char *key, const char *value);
 
+/**
+ Initialize the config system by reading the config file.
 
-//
-// Initialize the config system by reading the config file.
-//
-int conf_init(const char *conf_file)
-{
+ @param conf_file <#conf_file description#>
+ @return <#return value description#>
+ */
+int conf_init(const char *conf_file) {
     FILE *fp;
     char line[BUFFER_SIZE], *s, *key, *value;
     int count;
 
-
     memset(&options, 0, sizeof(options));
 
+//    char path[MAXPATHLEN];
+//    char *path;
+//    path = (char *)malloc(MAXPATHLEN);
+//    if (path == NULL) {
+//        perror("Unable to allocate memory");
+//        exit(1);
+//    }
+
+//    getcwd(path, MAXPATHLEN);
+//    printf("Current directory is '%s'\n", path);
     fp = fopen(conf_file, "r");
     if (fp == NULL) {
         printf("Config file not found.\r\n");
@@ -72,7 +82,8 @@ int conf_init(const char *conf_file)
         key = s;
         s = strchr(key, '=');
         if (s == NULL) {
-            printf("Error reading config file at line %d, no = found.\r\n", count);
+            printf("Error reading config file at line %d, no = found.\r\n",
+                   count);
             fclose(fp);
 
             return -1;
@@ -98,21 +109,18 @@ int conf_init(const char *conf_file)
         //
         // Save the config option.
         //
-      conf_add(key, value);
+        conf_add(key, value);
     }
     fclose(fp);
 
     return 0;
 }
 
-
 //
 // Free all memory used by the config system.
 //
-void conf_free()
-{
+void conf_free() {
     int i;
-
 
     for (i = 0; i < CONFIG_MAX; i++) {
         if (options[i].key != NULL) {
@@ -126,15 +134,12 @@ void conf_free()
     }
 }
 
-
 //
 // Add a new value to the config system. Returns 0 on success or -1 on
 // failue.
 //
-static int conf_add(const char *key, const char *value)
-{
+static int conf_add(const char *key, const char *value) {
     int i;
-
 
     for (i = 0; i < CONFIG_MAX; i++) {
         if (options[i].key == NULL) {
@@ -148,15 +153,12 @@ static int conf_add(const char *key, const char *value)
     return -1;
 }
 
-
 //
 // Find the value of the given option. Returns NULL if no option has been
 // defined.
 //
-const char *conf_find(const char *option)
-{
+const char *conf_find(const char *option) {
     int i;
-
 
     for (i = 0; i < CONFIG_MAX && options[i].key != NULL; i++) {
         if (strcmp(options[i].key, option) == 0)
@@ -165,6 +167,3 @@ const char *conf_find(const char *option)
 
     return NULL;
 }
-
-
-

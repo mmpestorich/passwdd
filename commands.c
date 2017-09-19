@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,19 +20,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <sasl/sasl.h>
-#include <sasl/saslutil.h>
-#include <limits.h>
-#include <openssl/rsa.h>
 #include "commands.h"
-#include "utils.h"
 #include "keys.h"
 #include "ldap.h"
 #include "pwdb.h"
-
+#include "utils.h"
+#include <limits.h>
+#include <openssl/rsa.h>
+#include <sasl/sasl.h>
+#include <sasl/saslutil.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 //
 // Command functions take 5 arguments:
@@ -52,60 +51,53 @@ DEALINGS IN THE SOFTWARE.
 //
 // Build the table of client commands we support.
 //
-ClientCommand clientCommands[] = {
-    { "LIST",           command_list },
-    { "RSAPUBLIC",      command_rsapublic },
-    { "RSAVALIDATE",    command_rsavalidate },
-    { "LISTREPLICAS",   command_listreplicas },
+ClientCommand clientCommands[] = {{"LIST", command_list},
+                                  {"RSAPUBLIC", command_rsapublic},
+                                  {"RSAVALIDATE", command_rsavalidate},
+                                  {"LISTREPLICAS", command_listreplicas},
 
-    { "NEWUSER",        command_newuser },
-    { "DELETEUSER",     command_deleteuser },
-    { "CHANGEPASS",     command_changepass },
-    { "USER",           command_user },
-    { "AUTH",           command_auth },
-    { "AUTH2",          command_auth2 },
+                                  {"NEWUSER", command_newuser},
+                                  {"DELETEUSER", command_deleteuser},
+                                  {"CHANGEPASS", command_changepass},
+                                  {"USER", command_user},
+                                  {"AUTH", command_auth},
+                                  {"AUTH2", command_auth2},
 
-    { "GETPOLICY",      command_getpolicy },
+                                  {"GETPOLICY", command_getpolicy},
 
-    { "QUIT",           command_quit },
-    { NULL,             NULL }
-};
-
-
+                                  {"QUIT", command_quit},
+                                  {NULL, NULL}};
 
 //
 // List the supported authentication mechanisms by this server.
 //
-int command_list(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_list(char *response, int argc, char *argv[], Client *client,
+                 void *context) {
     buffercatf(response, "+OK %s\r\n", SUPPORTED_MECHS);
 
     return 0;
 }
 
-
 //
 // Retrieve the RSA Public key information for this server.
 //
-int command_rsapublic(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_rsapublic(char *response, int argc, char *argv[], Client *client,
+                      void *context) {
     buffercatf(response, "+OK %s\r\n", publicKeyThumbprint);
 
     return 0;
 }
-
 
 //
 // Used by the client to make 100% sure it is talking to the right
 // server. It sends us a value encrypted with our public key and then
 // we decrypt it and send it back to the client for it to validate.
 //
-int command_rsavalidate(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_rsavalidate(char *response, int argc, char *argv[], Client *client,
+                        void *context) {
     char encoded[BUFFER_SIZE], data[BUFFER_SIZE];
     int encodedLen;
     unsigned long len;
-
 
     //
     // Verify we have the required number of arguments.
@@ -129,10 +121,9 @@ int command_rsavalidate(char *response, int argc, char *argv[], Client *client, 
     //
     // Decrypt the data into cleartext.
     //
-    len = RSA_private_decrypt(encodedLen,
-                              (unsigned char *)encoded,
-                              (unsigned char *)data,
-                              privateKey, RSA_PKCS1_PADDING);
+    len = RSA_private_decrypt(encodedLen, (unsigned char *)encoded,
+                              (unsigned char *)data, privateKey,
+                              RSA_PKCS1_PADDING);
 
     //
     // Check for a decryption error.
@@ -161,23 +152,23 @@ int command_rsavalidate(char *response, int argc, char *argv[], Client *client, 
     return 1;
 }
 
-
 //
 // Retrieve a list of replica servers. This is an exact duplicate of the data
 // in the directory's "apple-password-server-list" key.
 //
-int command_listreplicas(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_listreplicas(char *response, int argc, char *argv[], Client *client,
+                         void *context) {
     char *xml = ldap_replicalist();
-
 
     //
     // The ApplePasswordServer does not include an extra \r\n, which seems wrong
     // to me, but when I include an extra \r\n things go bad.  So maybe it just
-    // checks if there is a "final" \r\n and adds it if there isn't, I don't know
+    // checks if there is a "final" \r\n and adds it if there isn't, I don't
+    // know
     // just yet.
     //
-    // Suddenly things are not working if I don't include the \r\n.  Will have to
+    // Suddenly things are not working if I don't include the \r\n.  Will have
+    // to
     // study further.
     //
     buffercatf(response, "+OK %d %s\r\n", strlen(xml), xml);
@@ -185,18 +176,16 @@ int command_listreplicas(char *response, int argc, char *argv[], Client *client,
     return 0;
 }
 
-
 //
 // Create a new user and password, this is only used when creating
 // OpenDirectory passwords, which we do not support yet.
 //
-int command_newuser(char *response, int argc, char *argv[], Client *client, void *context)
-{
-    const char	*decoded = NULL;
-    unsigned	decodedLen = 0;
-    char	encoded[BUFFER_SIZE * 2];
-    int		encodedLen, ret;
-
+int command_newuser(char *response, int argc, char *argv[], Client *client,
+                    void *context) {
+    const char *decoded = NULL;
+    unsigned decodedLen = 0;
+    char encoded[BUFFER_SIZE * 2];
+    int encodedLen, ret;
 
     //
     // Verify we have the required number of arguments.
@@ -230,8 +219,7 @@ int command_newuser(char *response, int argc, char *argv[], Client *client, void
         memset((void *)decoded, 0, decodedLen);
         printf("pwdb_adduser returned %d\r\n", ret);
         buffercatf(response, "-ERR Failed to add user\r\n");
-    }
-    else {
+    } else {
         memset((void *)decoded, 0, decodedLen);
         buffercatf(response, "+OK %s\r\n", argv[1]);
     }
@@ -239,12 +227,11 @@ int command_newuser(char *response, int argc, char *argv[], Client *client, void
     return 2;
 }
 
-
 //
 // Delete the user from the database. Right now this is a no-op.
 //
-int command_deleteuser(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_deleteuser(char *response, int argc, char *argv[], Client *client,
+                       void *context) {
     //
     // Verify we have the required number of arguments.
     //
@@ -262,17 +249,15 @@ int command_deleteuser(char *response, int argc, char *argv[], Client *client, v
     return 1;
 }
 
-
 //
 // Change a user's password. Right now this is a no-op.
 //
-int command_changepass(char *response, int argc, char *argv[], Client *client, void *context)
-{
-    const char	*decoded = NULL;
-    unsigned	decodedLen = 0;
-    char	encoded[BUFFER_SIZE];
-    int		encodedLen;
-
+int command_changepass(char *response, int argc, char *argv[], Client *client,
+                       void *context) {
+    const char *decoded = NULL;
+    unsigned decodedLen = 0;
+    char encoded[BUFFER_SIZE];
+    int encodedLen;
 
     //
     // Verify we have the required number of arguments.
@@ -310,15 +295,13 @@ int command_changepass(char *response, int argc, char *argv[], Client *client, v
     return 2;
 }
 
-
 //
 // Store the username to be used for this connection.
 //
-int command_user(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_user(char *response, int argc, char *argv[], Client *client,
+                 void *context) {
     sasl_security_properties_t secprops;
     int result = 0;
-
 
     //
     // Check for the required number of arguments.
@@ -332,7 +315,8 @@ int command_user(char *response, int argc, char *argv[], Client *client, void *c
     //
     // Initialize the SASL connection.
     //
-    result = sasl_server_new("rcmd", NULL, NULL, NULL, NULL, NULL, 0, &client->sasl);
+    result =
+        sasl_server_new("rcmd", NULL, NULL, NULL, NULL, NULL, 0, &client->sasl);
     if (result != SASL_OK) {
         buffercatf(response, "-ERR SASL Error %d\r\n", result);
 
@@ -367,24 +351,21 @@ int command_user(char *response, int argc, char *argv[], Client *client, void *c
             return result;
 
         result += 1;
-    }
-    else
+    } else
         buffercatf(response, "+OK %s\r\n", SUPPORTED_MECHS);
 
     return 1 + result;
 }
 
-
 //
 // Begin authentication of the specified user.
 //
-int command_auth(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_auth(char *response, int argc, char *argv[], Client *client,
+                 void *context) {
     unsigned char data[BUFFER_SIZE];
     const char *out;
     unsigned outlen;
     int result, args = 0, dataLen = 0;
-
 
     //
     // Check for the required number of arguments.
@@ -415,8 +396,7 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
             //
             hexToBinary(argv[3], data, &dataLen);
             args += 2;
-        }
-        else {
+        } else {
             hexToBinary(argv[2], data, &dataLen);
             args++;
         }
@@ -425,9 +405,7 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
     //
     // Begin a the SASL authentication for the client.
     //
-    result = sasl_server_start(client->sasl,
-                               argv[1],
-                               (char *)data, dataLen,
+    result = sasl_server_start(client->sasl, argv[1], (char *)data, dataLen,
                                &out, &outlen);
 
     //
@@ -443,8 +421,7 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
                 buffercatf(response, "+AUTHOK %s\r\n", hex);
             else
                 buffercatf(response, "+OK %s\r\n", hex);
-        }
-        else {
+        } else {
             if ((long)context == 1)
                 buffercatf(response, "+AUTHOK\r\n");
             else
@@ -452,7 +429,8 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
         }
 
         if (result == SASL_OK)
-            printf("Authenticated user %s using %s\r\n", client->username, argv[1]);
+            printf("Authenticated user %s using %s\r\n", client->username,
+                   argv[1]);
 
         return args;
     }
@@ -472,18 +450,16 @@ int command_auth(char *response, int argc, char *argv[], Client *client, void *c
     return args;
 }
 
-
 //
 // Continue authentication of the specified user.
 //
-int command_auth2(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_auth2(char *response, int argc, char *argv[], Client *client,
+                  void *context) {
     const char *out;
     unsigned char data[BUFFER_SIZE];
     int dataLen = 0;
     unsigned outlen;
     int result;
-
 
     //
     // Check for the required number of arguments.
@@ -511,9 +487,8 @@ int command_auth2(char *response, int argc, char *argv[], Client *client, void *
     //
     // Continue the SASL authentication for the client.
     //
-    result = sasl_server_step(client->sasl,
-                               (char *)data, dataLen,
-                               &out, &outlen);
+    result =
+        sasl_server_step(client->sasl, (char *)data, dataLen, &out, &outlen);
 
     //
     // If result is SASL_OK then we are finished.
@@ -549,25 +524,22 @@ int command_auth2(char *response, int argc, char *argv[], Client *client, void *
     return 1;
 }
 
-
 //
 // Client is done and wants to disconnect.
 //
-int command_quit(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_quit(char *response, int argc, char *argv[], Client *client,
+                 void *context) {
     buffercatf(response, "+OK password server signing off.\r\n");
 
     return -1;
 }
 
-
 //
 // Client wants to get policy information on a user.
 //
-int command_getpolicy(char *response, int argc, char *argv[], Client *client, void *context)
-{
+int command_getpolicy(char *response, int argc, char *argv[], Client *client,
+                      void *context) {
     int args = 1;
-
 
     if (argc >= 3 && strcasecmp(argv[2], "ACTUAL") == 0)
         args = 2;
@@ -576,5 +548,3 @@ int command_getpolicy(char *response, int argc, char *argv[], Client *client, vo
 
     return args;
 }
-
-

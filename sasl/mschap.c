@@ -20,12 +20,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h> 
 #include <stdint.h>
-#include <sasl.h>
-#include <saslplug.h>
+#include <sasl/sasl.h>
+#include <sasl/saslplug.h>
 
 #include "plugin_common.h"
 

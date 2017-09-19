@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,37 +20,32 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <sasl/saslutil.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sasl/saslutil.h>
 
 #include "common.h"
 #include "utils.h"
-
 
 //
 // Allows us to do sprintf style code with a buffer in a safe way.
 // Appends to the buffer.
 //
-void buffercatf(char *buffer, const char *format, ...)
-{       
+void buffercatf(char *buffer, const char *format, ...) {
     va_list args;
-            
-            
+
     va_start(args, format);
-    vsnprintf(buffer + strlen(buffer), BUFFER_SIZE - strlen(buffer),
-              format, args);
+    vsnprintf(buffer + strlen(buffer), BUFFER_SIZE - strlen(buffer), format,
+              args);
     va_end(args);
 }
-
 
 //
 // A merged implementation of snprintf and strncat.
 //
-size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...)
-{
+size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...) {
     size_t result;
     va_list args;
     size_t len = strnlen(buf, bufSize);
@@ -63,19 +58,15 @@ size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...)
     return result + len;
 }
 
-
 //
 // Convert the given raw binary data into a hex-string format. The hex
 // string buffer must have enough room for the stored data.
 //
-void binaryToHex(const unsigned char *data, int len, char *hexStr)
-{
+void binaryToHex(const unsigned char *data, int len, char *hexStr) {
     int i;
     char h, l;
 
-
-    for (i = 0; i < len; i++ )
-    {
+    for (i = 0; i < len; i++) {
         h = (data[i] & 0xF0) >> 4;
         l = (data[i] & 0x0F);
 
@@ -93,20 +84,16 @@ void binaryToHex(const unsigned char *data, int len, char *hexStr)
     *hexStr = '\0';
 }
 
-
 //
 // Convert the hex-string into a raw binary data stream. The length of the
 // data buffer is stored in the 'len' parameter. The output data buffer must
 // have enough room to store the raw data-stream.
 //
-void hexToBinary(const char *hexStr, unsigned char *data, int *len)
-{
+void hexToBinary(const char *hexStr, unsigned char *data, int *len) {
     unsigned char *d = data;
     unsigned char val;
 
-
-    while (*hexStr != '\0' && *(hexStr + 1) != '\0')
-    {
+    while (*hexStr != '\0' && *(hexStr + 1) != '\0') {
         if (*hexStr >= 'A')
             val = ((*hexStr - 'A' + 0x0A) << 4);
         else
@@ -125,19 +112,16 @@ void hexToBinary(const char *hexStr, unsigned char *data, int *len)
     *len = (d - data);
 }
 
-
 //
 // Convert a binary data stream into a base-64 encoded string. Also prepend
 // the original binary data length to the output string.
 //
-int binaryToBase64(const char *data, int len, char *str)
-{
+int binaryToBase64(const char *data, int len, char *str) {
     int result;
     unsigned int outLen;
     char *tempBuf;
 
-
-    tempBuf = (char *) malloc(len * 2);
+    tempBuf = (char *)malloc(len * 2);
     if (tempBuf == NULL)
         return -1;
 
@@ -150,23 +134,19 @@ int binaryToBase64(const char *data, int len, char *str)
     return result;
 }
 
-
 //
 // Convert a base-64 encoded string into a binary stream. Do a check if the
 // string includes the original length at the beginning.
 //
-int base64ToBinary(const char *hexStr, char *data, int *dataLen)
-{
+int base64ToBinary(const char *hexStr, char *data, int *dataLen) {
     int result;
     unsigned int sasl_outlen;
     unsigned long attached_outlen = 0;
 
-
     //
     // Get the original length if they provided it.
     //
-    if (*hexStr == '{')
-    {
+    if (*hexStr == '{') {
         sscanf(hexStr + 1, "%lu", &attached_outlen);
 
         hexStr = strchr(hexStr, '}');
@@ -176,7 +156,8 @@ int base64ToBinary(const char *hexStr, char *data, int *dataLen)
         hexStr++;
     }
 
-    result = sasl_decode64(hexStr, strlen(hexStr), (char *)data, BUFFER_SIZE, &sasl_outlen);
+    result = sasl_decode64(hexStr, strlen(hexStr), (char *)data, BUFFER_SIZE,
+                           &sasl_outlen);
 
     if (attached_outlen > 0 && attached_outlen != sasl_outlen)
         return -1;
@@ -185,6 +166,3 @@ int base64ToBinary(const char *hexStr, char *data, int *dataLen)
 
     return result;
 }
-
-
-

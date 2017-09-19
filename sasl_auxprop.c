@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -20,16 +20,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "common.h"
+#include "pwdb.h"
 #include <sasl/sasl.h>
 #include <sasl/saslplug.h>
 #include <sasl/saslutil.h>
-#include "pwdb.h"
-#include "common.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 //
 // Do a lookup for the specified user's password, as well as a few extra
@@ -37,54 +36,42 @@ DEALINGS IN THE SOFTWARE.
 //
 static void lpws_internal_auxprop_lookup(void *glob_context,
                                          sasl_server_params_t *sparams,
-                                         unsigned flags,
-                                         const char *user,
-                                         unsigned ulen)
-{
-    char	password[PASSWORD_MAX + 1];
-
+                                         unsigned flags, const char *user,
+                                         unsigned ulen) {
+    char password[PASSWORD_MAX + 1];
 
     if (pwdb_getpassword(user, password, sizeof(password)) == 0) {
-	sparams->utils->prop_erase(sparams->propctx,
-				SASL_AUX_PASSWORD);
-	sparams->utils->prop_set(sparams->propctx, SASL_AUX_PASSWORD,
-				password, strlen(password));
+        sparams->utils->prop_erase(sparams->propctx, SASL_AUX_PASSWORD);
+        sparams->utils->prop_set(sparams->propctx, SASL_AUX_PASSWORD, password,
+                                 strlen(password));
         memset(password, 0, sizeof(password));
     }
 }
 
-
 //
 // Free memory used by this plugin.
 //
-static void lpws_internal_auxprop_free(void *glob_context, const sasl_utils_t *utils)
-{
-}
-
+static void lpws_internal_auxprop_free(void *glob_context,
+                                       const sasl_utils_t *utils) {}
 
 //
 // The structure that defines this plugin.
 //
 static sasl_auxprop_plug_t lpws_internal_auxprop_plugin = {
-	0,
-	0,
-	NULL,
-	lpws_internal_auxprop_free,
-	lpws_internal_auxprop_lookup,
-	"lpws_internal",
-	NULL
-};
-
+    0,
+    0,
+    NULL,
+    lpws_internal_auxprop_free,
+    lpws_internal_auxprop_lookup,
+    "lpws_internal",
+    NULL};
 
 //
 // Initialize the auxprop plugin for use.
 //
-int lpws_internal_auxprop_init(const sasl_utils_t *utils,
-                               int max_version,
-                               int *out_version,
-                               sasl_auxprop_plug_t **plug,
-                               const char *plugname)
-{
+int lpws_internal_auxprop_init(const sasl_utils_t *utils, int max_version,
+                               int *out_version, sasl_auxprop_plug_t **plug,
+                               const char *plugname) {
     //
     // Register us with the plugin system.
     //

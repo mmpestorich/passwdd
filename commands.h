@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,14 +23,13 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
 
-#include <stdio.h>
 #include "client.h"
-
+#include <stdio.h>
 
 //
 // Format for the client handlers.
 //
-typedef int (* ClientHandler)(char *, int, char *[], Client *, void *);
+typedef int (*ClientHandler)(char *, int, char *[], Client *, void *);
 
 typedef struct {
     const char *command;
@@ -55,4 +54,3 @@ extern int command_quit(char *, int, char *[], Client *, void *);
 extern ClientCommand clientCommands[];
 
 #endif /* __COMMANDS_H__ */
-

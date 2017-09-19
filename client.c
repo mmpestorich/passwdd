@@ -21,39 +21,32 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
-#include "common.h"
 #include "client.h"
 #include "commands.h"
+#include "common.h"
 #include "utils.h"
 
-
 Client clients[CLIENT_MAX];
-
 
 //
 // Initialize the client library.
 //
-void init_client()
-{
+void client_init() {
     int i;
-
 
     for (i = 0; i < CLIENT_MAX; i++)
         clients[i].fd = -1;
 }
 
-
 //
 // Add all active clients into the fd_set.
 //
-int setup_clients_fdset(fd_set *read_fds)
-{
+int clients_setup_fdset(fd_set *read_fds) {
     int i, maxfd = -1;
-
 
     for (i = 0; i < CLIENT_MAX; i++) {
         if (clients[i].fd != -1) {
@@ -66,39 +59,33 @@ int setup_clients_fdset(fd_set *read_fds)
     return maxfd;
 }
 
-
 //
 // Process all clients that are marked as needed to be read.
 //
-void process_clients(fd_set *read_fds)
-{
+void clients_process_message(fd_set *read_fds) {
     int i;
-
 
     for (i = 0; i < CLIENT_MAX; i++) {
         if (clients[i].fd != -1) {
             if (FD_ISSET(clients[i].fd, read_fds)) {
-                process_client(clients[i].fd);
+                client_process_message(clients[i].fd);
             }
         }
     }
 }
 
-
 //
 // Process a message from the client.
 //
-void process_client(int fd)
-{
-    Client *client = find_client(fd);
+void client_process_message(int fd) {
+    Client *client = client_find(fd);
     char buffer[BUFFER_SIZE], *args[ARGS_MAX], *s;
     char response[BUFFER_SIZE];
     int i, len, argc, destroy = 0, c, result;
 
-
     len = recv(fd, buffer, sizeof(buffer) - 1, 0);
     if (len < 1) {
-        destroy_client(fd);
+        client_destroy(fd);
 
         return;
     }
@@ -118,8 +105,7 @@ void process_client(int fd)
             args[argc++] = s;
             if (argc == ARGS_MAX)
                 break;
-        }
-        else if (*s == '\r' || *s == '\n')
+        } else if (*s == '\r' || *s == '\n')
             *s++ = '\0';
     }
 
@@ -133,7 +119,8 @@ void process_client(int fd)
         //
         for (c = 0; clientCommands[c].command != NULL; c++) {
             if (strcasecmp(args[i], clientCommands[c].command) == 0) {
-                result = clientCommands[c].handler(response, (argc - i), &args[i], client, NULL);
+                result = clientCommands[c].handler(response, (argc - i),
+                                                   &args[i], client, NULL);
                 if (result < 0)
                     destroy = 1;
                 else
@@ -166,19 +153,16 @@ void process_client(int fd)
     // Close the socket if requested.
     //
     if (destroy) {
-        destroy_client(fd);
+        client_destroy(fd);
     }
 }
-
 
 //
 // Add a new client to the first available slot and return a reference to
 // that client record. If no more slots are available than NULL is returned.
 //
-Client *add_client(int fd, sasl_conn_t *sasl)
-{
+Client *client_add(int fd, sasl_conn_t *sasl) {
     int i;
-
 
     for (i = 0; i < CLIENT_MAX; i++) {
         if (clients[i].fd == -1) {
@@ -192,14 +176,11 @@ Client *add_client(int fd, sasl_conn_t *sasl)
     return NULL;
 }
 
-
 //
 // Destroy a client and free memory.
 //
-void destroy_client(int fd)
-{
+void client_destroy(int fd) {
     int i;
-
 
     for (i = 0; i < CLIENT_MAX; i++) {
         if (clients[i].fd == fd) {
@@ -213,11 +194,8 @@ void destroy_client(int fd)
     close(fd);
 }
 
-
-Client *find_client(int fd)
-{
+Client *client_find(int fd) {
     int i;
-
 
     for (i = 0; i < CLIENT_MAX; i++) {
         if (clients[i].fd == fd)
@@ -226,5 +204,3 @@ Client *find_client(int fd)
 
     return NULL;
 }
-
-

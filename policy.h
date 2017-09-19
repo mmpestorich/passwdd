@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,6 @@ DEALINGS IN THE SOFTWARE.
 #define __POLICY_H__
 
 #include <stdint.h>
-
 
 extern const char *kPolicyUsingHistory;
 extern const char *kPolicyCanModifyPasswordForSelf;
@@ -106,12 +105,10 @@ typedef struct gPasswordPolicy {
     uint64_t passwordLastSetTime;
 } aPasswordPolicy;
 
-
-aPasswordPolicy	*policy_new(const char *policy_string);
-void		policy_delete(aPasswordPolicy *policy);
-int		policy_parse(aPasswordPolicy *policy,
-			     const char *policy_string);
-int		policy_to_string(aPasswordPolicy *policy,
-				 char *string, int string_max, int isUser);
+aPasswordPolicy *policy_new(const char *policy_string);
+void policy_delete(aPasswordPolicy *policy);
+int policy_parse(aPasswordPolicy *policy, const char *policy_string);
+int policy_to_string(aPasswordPolicy *policy, char *string, int string_max,
+                     int isUser);
 
 #endif /* __POLICY_H__ */

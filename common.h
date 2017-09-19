@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,18 +23,21 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#define USERNAME_MAX 63
+#define PASSWORD_MAX 127
 
-#define USERNAME_MAX    63
-#define PASSWORD_MAX	127
-
-#define LISTENER_MAX    32
-#define CLIENT_MAX      64
-#define POLICY_MAX      2048
-#define BUFFER_SIZE     1024
-#define ARGS_MAX        32
-#define SUPPORTED_MECHS "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" \"PPS\" \"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" \"DHX\" \"APOP\" )"
+#define LISTENER_MAX 32
+#define CLIENT_MAX 64
+#define POLICY_MAX 2048
+#define BUFFER_SIZE 1024
+#define ARGS_MAX 32
+#define SUPPORTED_MECHS                                                        \
+    "(SASL \"SMB-NTLMv2\" \"SMB-NT\" \"SMB-LAN-MANAGER\" \"MS-CHAPv2\" "       \
+    "\"PPS\" "                                                                 \
+    "\"OTP\" \"GSSAPI\" \"DIGEST-MD5\" \"CRAM-MD5\" \"WEBDAV-DIGEST\" "        \
+    "\"DHX\" "                                                                 \
+    "\"APOP\" )"
 
 #define DEBUG
 
 #endif /* __COMMON_H__ */
-

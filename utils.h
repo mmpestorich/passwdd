@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,12 +23,10 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-
 extern const char *myHostname, *myAddress;
 
 void buffercatf(char *buffer, const char *format, ...);
 extern size_t snprintfcat(char *buf, size_t bufSize, char const *fmt, ...);
-
 
 void binaryToHex(const unsigned char *data, int len, char *hexStr);
 void hexToBinary(const char *hexStr, unsigned char *data, int *len);
@@ -36,6 +34,4 @@ void hexToBinary(const char *hexStr, unsigned char *data, int *len);
 int binaryToBase64(const char *data, int len, char *hexStr);
 int base64ToBinary(const char *hexStr, char *data, int *dataLen);
 
-
 #endif /* __UTILS_H__ */
-

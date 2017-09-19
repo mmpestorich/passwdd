@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,10 +23,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#include <sys/select.h>
-#include <sasl/sasl.h>
 #include "common.h"
-
+#include <sasl/sasl.h>
+#include <sys/select.h>
 
 typedef struct {
     int fd;
@@ -34,16 +33,14 @@ typedef struct {
     sasl_conn_t *sasl;
 } Client;
 
+extern void client_init();
 
-extern void init_client();
+extern int clients_setup_fdset(fd_set *read_fds);
+extern void clients_process_message(fd_set *read_fds);
+extern void client_process_message(int fd);
 
-extern int setup_clients_fdset(fd_set *read_fds);
-extern void process_clients(fd_set *read_fds);
-extern void process_client(int fd);
-
-extern Client *add_client(int fd, sasl_conn_t *sasl);
-extern void destroy_client(int fd);
-extern Client *find_client(int fd);
+extern Client *client_add(int fd, sasl_conn_t *sasl);
+extern void client_destroy(int fd);
+extern Client *client_find(int fd);
 
 #endif /* __CLIENT_H__ */
-

@@ -20,7 +20,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -31,9 +31,9 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #include <assert.h>
 
-#include <sasl.h>
-#include <saslplug.h>
-#include <saslutil.h>
+#include <sasl/sasl.h>
+#include <sasl/saslplug.h>
+#include <sasl/saslutil.h>
 
 #include "plugin_common.h"
 

@@ -1,0 +1,965 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		B5E6500C879F43DCBD20187B /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = CD0B508FB61849ACA54D47F4 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				77CD3EA20DFA44D28596467A /* CMake Rules */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		B93E05AE5B0C4B859ED92BC0 /* install */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 21DA2682AF6A4460A0498B84 /* Build configuration list for PBXAggregateTarget "install" */;
+			buildPhases = (
+				6F4146004D94472DAA12F1AB /* CMake PostBuild Rules */,
+			);
+			dependencies = (
+				30D1A4D73DAE43CDA4619645 /* PBXTargetDependency */,
+			);
+			name = install;
+			productName = install;
+		};
+		BDD9616F9E8D46628DB43308 /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = F0A314494E9C4859AF39A623 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				705313D3003A405C8549F24B /* CMake Rules */,
+			);
+			dependencies = (
+				DA49C823B86042D599794089 /* PBXTargetDependency */,
+				6CCB00CC0A604ED8AEEFA057 /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		29161001851A4B718DA7D264 /* policy.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6386C935C4A6280A86006 /* policy.c */; };
+		2C4A7A18700741A29FD4EC30 /* listener.c in Sources */ = {isa = PBXBuildFile; fileRef = 403BB50B70F44F40BAF0B8D7 /* listener.c */; };
+		4A31CC0594A843D2969A8763 /* keys.c in Sources */ = {isa = PBXBuildFile; fileRef = CDCF808C117F4023ABA1706B /* keys.c */; };
+		60CFA4DEB0674EF5981A08FE /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = 6291BFA4DDD64C6E8A6B5F5B /* client.c */; };
+		8A8ADB407A304343B3EE84C9 /* sasl_auxprop.c in Sources */ = {isa = PBXBuildFile; fileRef = 42A70072639D44C2B96ED613 /* sasl_auxprop.c */; };
+		9317135D586C4DF4A3DE6C40 /* commands.c in Sources */ = {isa = PBXBuildFile; fileRef = 34192D7B55E94E8E98BB1097 /* commands.c */; };
+		B64D8015F3EF4E94A40AD7DD /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = A105F625759B4C959CDADB5B /* utils.c */; };
+		B78460CC38494C04ABA8F992 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 138B449ADE2248179B6E2AB2 /* main.c */; };
+		BEAE71D009F647C28EFAAC10 /* ldap.c in Sources */ = {isa = PBXBuildFile; fileRef = A3696CDF1D4349908CB897B3 /* ldap.c */; };
+		D6F5CC5BD7004E52BE249C1D /* conf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0739CA0065C14AD18AC3DD82 /* conf.c */; };
+		F7D46839708F44509EBFE492 /* pwdb.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9125A2DAF486C8D54FE64 /* pwdb.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		08F7374A8BFB4B9C9360F394 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A91DBAF1CE604C63A2E85255 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5E6500C879F43DCBD20187B;
+			remoteInfo = ZERO_CHECK;
+		};
+		7DDCA9964763427798DD9B9D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A91DBAF1CE604C63A2E85255 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 95C48225E9204466908317C5;
+			remoteInfo = passwdd;
+		};
+		C2086E66136F4970972688AA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A91DBAF1CE604C63A2E85255 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BDD9616F9E8D46628DB43308;
+			remoteInfo = ALL_BUILD;
+		};
+		C37E5B9E45364C3B8461A9EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A91DBAF1CE604C63A2E85255 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5E6500C879F43DCBD20187B;
+			remoteInfo = ZERO_CHECK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0739CA0065C14AD18AC3DD82 /* conf.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = conf.c; sourceTree = SOURCE_ROOT; };
+		138B449ADE2248179B6E2AB2 /* main.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = main.c; sourceTree = SOURCE_ROOT; };
+		2F41DB522E8A418EB798652F /* listener.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = listener.h; sourceTree = SOURCE_ROOT; };
+		323FFBE21C2E482DB8C77D29 /* keys.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = keys.h; sourceTree = SOURCE_ROOT; };
+		34192D7B55E94E8E98BB1097 /* commands.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = commands.c; sourceTree = SOURCE_ROOT; };
+		362B9FBBB440403599FC8B39 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		403BB50B70F44F40BAF0B8D7 /* listener.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = listener.c; sourceTree = SOURCE_ROOT; };
+		42A70072639D44C2B96ED613 /* sasl_auxprop.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = sasl_auxprop.c; sourceTree = SOURCE_ROOT; };
+		4BF6386C935C4A6280A86006 /* policy.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = policy.c; sourceTree = SOURCE_ROOT; };
+		4F40B95AAA7B4461924C3BC1 /* commands.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = commands.h; sourceTree = SOURCE_ROOT; };
+		52A6D3CC015949C0924B6D28 /* common.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = common.h; sourceTree = SOURCE_ROOT; };
+		5300AAE89BB04064AA4E07D7 /* passwdd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = passwdd; sourceTree = BUILT_PRODUCTS_DIR; };
+		61A1FEB648AE45BCAF9E8D39 /* passwdd.conf */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = passwdd.conf; sourceTree = SOURCE_ROOT; };
+		6291BFA4DDD64C6E8A6B5F5B /* client.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = client.c; sourceTree = SOURCE_ROOT; };
+		8BECC048457A400995600CCC /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		8BF9125A2DAF486C8D54FE64 /* pwdb.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = pwdb.c; sourceTree = SOURCE_ROOT; };
+		8ECCA3A11E414BAD9B0406CE /* client.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = client.h; sourceTree = SOURCE_ROOT; };
+		926C318DBA664C31B3ED1A34 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		9430648728994538A6CF4CDE /* ldap.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = ldap.h; sourceTree = SOURCE_ROOT; };
+		95BF92ACDC5748E79C238084 /* pwdb.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = pwdb.h; sourceTree = SOURCE_ROOT; };
+		A105F625759B4C959CDADB5B /* utils.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = utils.c; sourceTree = SOURCE_ROOT; };
+		A356F0689E4340D9B32F8ED2 /* policy.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = policy.h; sourceTree = SOURCE_ROOT; };
+		A3696CDF1D4349908CB897B3 /* ldap.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = ldap.c; sourceTree = SOURCE_ROOT; };
+		B56CF1671C324331839547D8 /* conf.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = conf.h; sourceTree = SOURCE_ROOT; };
+		CDCF808C117F4023ABA1706B /* keys.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = keys.c; sourceTree = SOURCE_ROOT; };
+		CFEC370912C147CC9F9AE8C2 /* .clang-format */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
+		F5FB2F3BB5744AB8956401C1 /* sasl_auxprop.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = sasl_auxprop.h; sourceTree = SOURCE_ROOT; };
+		FBD96081916C41F49946E221 /* utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = utils.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0721AD082A174869A2FC1BFB /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				6291BFA4DDD64C6E8A6B5F5B /* client.c */,
+				34192D7B55E94E8E98BB1097 /* commands.c */,
+				0739CA0065C14AD18AC3DD82 /* conf.c */,
+				CDCF808C117F4023ABA1706B /* keys.c */,
+				A3696CDF1D4349908CB897B3 /* ldap.c */,
+				403BB50B70F44F40BAF0B8D7 /* listener.c */,
+				138B449ADE2248179B6E2AB2 /* main.c */,
+				4BF6386C935C4A6280A86006 /* policy.c */,
+				8BF9125A2DAF486C8D54FE64 /* pwdb.c */,
+				42A70072639D44C2B96ED613 /* sasl_auxprop.c */,
+				A105F625759B4C959CDADB5B /* utils.c */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		0AB43FFB17AA4BB690350AB9 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		29BBA7DA380944A8932977F6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CFEC370912C147CC9F9AE8C2 /* .clang-format */,
+				61A1FEB648AE45BCAF9E8D39 /* passwdd.conf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		4329DEE0D7394B379FE2C243 /* ZERO_CHECK */ = {
+			isa = PBXGroup;
+			children = (
+				0AB43FFB17AA4BB690350AB9 /* CMake Rules */,
+				362B9FBBB440403599FC8B39 /* CMakeLists.txt */,
+			);
+			name = ZERO_CHECK;
+			sourceTree = "<group>";
+		};
+		643ACE01A2EF4D2886109529 = {
+			isa = PBXGroup;
+			children = (
+				8E85462199B64BB6BBDE3B1E /* passwdd */,
+				8C344AF7CBF24F89B5D43D0E /* ALL_BUILD */,
+				4329DEE0D7394B379FE2C243 /* ZERO_CHECK */,
+				E2EAEC1EED77440C8AEE46B2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8C344AF7CBF24F89B5D43D0E /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				AD7C3290072644A9BA71DBF4 /* CMake Rules */,
+				8BECC048457A400995600CCC /* CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		8E85462199B64BB6BBDE3B1E /* passwdd */ = {
+			isa = PBXGroup;
+			children = (
+				9686E0109EB7458E8A861DDA /* Headers */,
+				0721AD082A174869A2FC1BFB /* Sources */,
+				29BBA7DA380944A8932977F6 /* Resources */,
+				926C318DBA664C31B3ED1A34 /* CMakeLists.txt */,
+			);
+			name = passwdd;
+			sourceTree = "<group>";
+		};
+		9686E0109EB7458E8A861DDA /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCA3A11E414BAD9B0406CE /* client.h */,
+				4F40B95AAA7B4461924C3BC1 /* commands.h */,
+				52A6D3CC015949C0924B6D28 /* common.h */,
+				B56CF1671C324331839547D8 /* conf.h */,
+				323FFBE21C2E482DB8C77D29 /* keys.h */,
+				9430648728994538A6CF4CDE /* ldap.h */,
+				2F41DB522E8A418EB798652F /* listener.h */,
+				A356F0689E4340D9B32F8ED2 /* policy.h */,
+				95BF92ACDC5748E79C238084 /* pwdb.h */,
+				F5FB2F3BB5744AB8956401C1 /* sasl_auxprop.h */,
+				FBD96081916C41F49946E221 /* utils.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		AD7C3290072644A9BA71DBF4 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		E2EAEC1EED77440C8AEE46B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5300AAE89BB04064AA4E07D7 /* passwdd */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		95C48225E9204466908317C5 /* passwdd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EDECBE0547A643E3A5A0FC60 /* Build configuration list for PBXNativeTarget "passwdd" */;
+			buildPhases = (
+				E535BEE477414ADAA5645769 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE3388F178EB465BA5226841 /* PBXTargetDependency */,
+			);
+			name = passwdd;
+			productName = passwdd;
+			productReference = 5300AAE89BB04064AA4E07D7 /* passwdd */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A91DBAF1CE604C63A2E85255 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 0830;
+			};
+			buildConfigurationList = CFF31C31C9CD45BAADA054AC /* Build configuration list for PBXProject "passwdd" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 643ACE01A2EF4D2886109529;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BDD9616F9E8D46628DB43308 /* ALL_BUILD */,
+				B5E6500C879F43DCBD20187B /* ZERO_CHECK */,
+				B93E05AE5B0C4B859ED92BC0 /* install */,
+				95C48225E9204466908317C5 /* passwdd */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6F4146004D94472DAA12F1AB /* CMake PostBuild Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake PostBuild Rules";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/mikempestorich/Source/OpenDirectory/passwdd -f /Users/mikempestorich/Source/OpenDirectory/passwdd/CMakeScripts/install_postBuildPhase.make$CONFIGURATION all";
+			showEnvVarsInLog = 0;
+		};
+		705313D3003A405C8549F24B /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			outputPaths = (
+				/Users/mikempestorich/Source/OpenDirectory/passwdd/CMakeFiles/ALL_BUILD,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/mikempestorich/Source/OpenDirectory/passwdd -f /Users/mikempestorich/Source/OpenDirectory/passwdd/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION all";
+			showEnvVarsInLog = 0;
+		};
+		77CD3EA20DFA44D28596467A /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			outputPaths = (
+				/Users/mikempestorich/Source/OpenDirectory/passwdd/CMakeFiles/ZERO_CHECK,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/mikempestorich/Source/OpenDirectory/passwdd -f /Users/mikempestorich/Source/OpenDirectory/passwdd/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION all";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E535BEE477414ADAA5645769 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60CFA4DEB0674EF5981A08FE /* client.c in Sources */,
+				9317135D586C4DF4A3DE6C40 /* commands.c in Sources */,
+				D6F5CC5BD7004E52BE249C1D /* conf.c in Sources */,
+				4A31CC0594A843D2969A8763 /* keys.c in Sources */,
+				BEAE71D009F647C28EFAAC10 /* ldap.c in Sources */,
+				2C4A7A18700741A29FD4EC30 /* listener.c in Sources */,
+				B78460CC38494C04ABA8F992 /* main.c in Sources */,
+				29161001851A4B718DA7D264 /* policy.c in Sources */,
+				F7D46839708F44509EBFE492 /* pwdb.c in Sources */,
+				8A8ADB407A304343B3EE84C9 /* sasl_auxprop.c in Sources */,
+				B64D8015F3EF4E94A40AD7DD /* utils.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		30D1A4D73DAE43CDA4619645 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BDD9616F9E8D46628DB43308 /* ALL_BUILD */;
+			targetProxy = C2086E66136F4970972688AA /* PBXContainerItemProxy */;
+		};
+		6CCB00CC0A604ED8AEEFA057 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5E6500C879F43DCBD20187B /* ZERO_CHECK */;
+			targetProxy = C37E5B9E45364C3B8461A9EB /* PBXContainerItemProxy */;
+		};
+		DA49C823B86042D599794089 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 95C48225E9204466908317C5 /* passwdd */;
+			targetProxy = 7DDCA9964763427798DD9B9D /* PBXContainerItemProxy */;
+		};
+		FE3388F178EB465BA5226841 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5E6500C879F43DCBD20187B /* ZERO_CHECK */;
+			targetProxy = 08F7374A8BFB4B9C9360F394 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		10EC86EC4B6648308FB3F212 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		154BCFBDB34149E7AC494250 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/opt/macports/include,
+					/Users/mikempestorich/Source/OpenDirectory/passwdd,
+					/usr/include/sasl,
+				);
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = (
+					"-arch",
+					x86_64,
+					"-DNDEBUG",
+					"'-std=gnu11'",
+				);
+				OTHER_LDFLAGS = (
+					"-L/opt/macports/lib",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					/opt/macports/lib/libcrypto.dylib,
+					/usr/lib/libsasl2.dylib,
+					/usr/lib/libldap.dylib,
+					/opt/macports/lib/db60/libdb.dylib,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = passwdd;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		36A8E48E978749BB88F65E78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = fast;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk;
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd/build;
+			};
+			name = Release;
+		};
+		40B3A1AEC1F946E6988BAA5B /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		53FAB04BAA62413B8524876A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		5CB366436BDC4CA4B853C16E /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		7040E47FEEBE4C44997EFDB7 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/opt/macports/include,
+					/Users/mikempestorich/Source/OpenDirectory/passwdd,
+					/usr/include/sasl,
+				);
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = (
+					"-arch",
+					x86_64,
+					"-DNDEBUG",
+					"'-std=gnu11'",
+				);
+				OTHER_LDFLAGS = (
+					"-L/opt/macports/lib",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					/opt/macports/lib/libcrypto.dylib,
+					/usr/lib/libsasl2.dylib,
+					/usr/lib/libldap.dylib,
+					/opt/macports/lib/db60/libdb.dylib,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = passwdd;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		7065E9C5D5A745F98CEE80C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		76062CFFC4B24E56AA0C6F63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/opt/macports/include,
+					/Users/mikempestorich/Source/OpenDirectory/passwdd,
+					/usr/include/sasl,
+				);
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = (
+					"-arch",
+					x86_64,
+					"'-std=gnu11'",
+				);
+				OTHER_LDFLAGS = (
+					"-L/opt/macports/lib",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					/opt/macports/lib/libcrypto.dylib,
+					/usr/lib/libsasl2.dylib,
+					/usr/lib/libldap.dylib,
+					/opt/macports/lib/db60/libdb.dylib,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = passwdd;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		7AA4EAF667C54E27B1EA3B2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk;
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd/build;
+			};
+			name = Debug;
+		};
+		92434864695A4DFDA7F5747B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		A3C9F0190319498592480C6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		A8BC5CD436F44782A1B6B5D1 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/opt/macports/include,
+					/Users/mikempestorich/Source/OpenDirectory/passwdd,
+					/usr/include/sasl,
+				);
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = (
+					"-arch",
+					x86_64,
+					"-DNDEBUG",
+					"'-std=gnu11'",
+				);
+				OTHER_LDFLAGS = (
+					"-L/opt/macports/lib",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					/opt/macports/lib/libcrypto.dylib,
+					/usr/lib/libsasl2.dylib,
+					/usr/lib/libldap.dylib,
+					/opt/macports/lib/db60/libdb.dylib,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = passwdd;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		B8455BA39BBD4E0DB9B3BCA6 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		B9BB069921E44A01ABDE7DCE /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 2;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk;
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd/build;
+			};
+			name = RelWithDebInfo;
+		};
+		BFF81EC2830C4331A78E8970 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		C107A4F042C040CB81B3C27F /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk;
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd/build;
+			};
+			name = MinSizeRel;
+		};
+		C4CAD6C5CD2141E592F659BE /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		DD97550DFFAB4328999F5A91 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		E25457CFD8CA4EA8BECA8EAA /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = /opt/macports/include;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/mikempestorich/Source/OpenDirectory/passwdd;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		21DA2682AF6A4460A0498B84 /* Build configuration list for PBXAggregateTarget "install" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92434864695A4DFDA7F5747B /* Debug */,
+				BFF81EC2830C4331A78E8970 /* Release */,
+				B8455BA39BBD4E0DB9B3BCA6 /* MinSizeRel */,
+				C4CAD6C5CD2141E592F659BE /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CD0B508FB61849ACA54D47F4 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53FAB04BAA62413B8524876A /* Debug */,
+				A3C9F0190319498592480C6C /* Release */,
+				E25457CFD8CA4EA8BECA8EAA /* MinSizeRel */,
+				40B3A1AEC1F946E6988BAA5B /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CFF31C31C9CD45BAADA054AC /* Build configuration list for PBXProject "passwdd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AA4EAF667C54E27B1EA3B2B /* Debug */,
+				36A8E48E978749BB88F65E78 /* Release */,
+				C107A4F042C040CB81B3C27F /* MinSizeRel */,
+				B9BB069921E44A01ABDE7DCE /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EDECBE0547A643E3A5A0FC60 /* Build configuration list for PBXNativeTarget "passwdd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				76062CFFC4B24E56AA0C6F63 /* Debug */,
+				154BCFBDB34149E7AC494250 /* Release */,
+				7040E47FEEBE4C44997EFDB7 /* MinSizeRel */,
+				A8BC5CD436F44782A1B6B5D1 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F0A314494E9C4859AF39A623 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7065E9C5D5A745F98CEE80C3 /* Debug */,
+				10EC86EC4B6648308FB3F212 /* Release */,
+				5CB366436BDC4CA4B853C16E /* MinSizeRel */,
+				DD97550DFFAB4328999F5A91 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A91DBAF1CE604C63A2E85255 /* Project object */;
+}

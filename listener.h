@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,12 +23,10 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __LISTENER_H__
 #define __LISTENER_H__
 
+extern int listeners_setup();
+extern void listeners_close();
 
-extern int setupListeners();
-extern void closeListeners();
-
-extern int poll_sockets();
-
+extern int listeners_poll();
+extern int listeners_kqueue();
 
 #endif /* __CLIENT_H__ */
-

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -31,4 +31,3 @@ extern RSA *privateKey;
 extern const char *publicKeyThumbprint;
 
 #endif /* __KEYS_H__ */
-

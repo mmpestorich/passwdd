@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -23,9 +23,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __LDAP_H__
 #define __LDAP_H__
 
-#include <stdio.h>
 #include <ldap.h>
-
+#include <stdio.h>
 
 extern LDAP *ldap_connect(int bind);
 extern void ldap_disconnect(LDAP *ldap);
@@ -33,4 +32,3 @@ extern char *ldap_replicalist();
 extern int ldap_updateAuthority();
 
 #endif /* __LDAP_H__ */
-

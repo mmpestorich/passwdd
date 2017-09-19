@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Daniel Hazelbaker  
+Copyright (C) 2012 Daniel Hazelbaker
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -28,9 +28,7 @@ DEALINGS IN THE SOFTWARE.
 #include <sasl/saslplug.h>
 #include <sasl/saslutil.h>
 
-
 extern int lpws_internal_auxprop_init(const sasl_utils_t *utils,
-                                      int max_version,
-                                      int *out_version,
+                                      int max_version, int *out_version,
                                       sasl_auxprop_plug_t **plug,
                                       const char *plugname);
